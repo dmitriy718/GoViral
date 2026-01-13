@@ -43,3 +43,4 @@ docker-data/
 
 # Secrets
 server/src/config/serviceAccountKey.json
+vpspass.txt
