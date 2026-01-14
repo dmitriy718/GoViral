@@ -13,6 +13,11 @@ const api = axios.create({
 
 api.interceptors.request.use(async (config) => {
   const user = auth.currentUser;
+  const url = config.url || '';
+  const isPublic = ['/articles', '/errors/report', '/health'].some((path) => url.startsWith(path));
+  if (!user && !isPublic) {
+    return Promise.reject(new axios.Cancel('auth-not-ready'));
+  }
   if (user) {
     const token = await user.getIdToken();
     config.headers.Authorization = `Bearer ${token}`;
@@ -22,10 +27,23 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+    const status = error.response?.status;
+    const originalRequest = error.config || {};
+    if (status === 401 && !originalRequest._retry && auth.currentUser) {
+      originalRequest._retry = true;
+      const token = await auth.currentUser.getIdToken(true);
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${token}`;
+      return api.request(originalRequest);
+    }
+
     const message = error.response?.data?.error || error.response?.data?.message || 'Something went wrong';
     // Don't toast for 401s as the auth context might handle it, or it might be a silent refresh
-    if (error.response?.status !== 401) {
+    if (status !== 401) {
       toast.error(message);
     }
     return Promise.reject(error);
@@ -51,6 +69,7 @@ export interface PostPayload {
   mediaUrl?: string;
   platform?: string;
   scheduledAt?: Date;
+  projectId?: string;
   autoPlugEnabled?: boolean;
   autoPlugThreshold?: number;
   autoPlugContent?: string;
