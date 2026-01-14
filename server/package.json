@@ -11,7 +11,8 @@
     "worker": "node dist/worker.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:migrate:dev": "prisma migrate dev"
+    "prisma:migrate:dev": "prisma migrate dev",
+    "reencrypt:tokens": "ts-node src/scripts/reencrypt_tokens.ts"
   },
   "keywords": [],
   "author": "",

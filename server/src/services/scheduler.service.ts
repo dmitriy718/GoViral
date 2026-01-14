@@ -12,6 +12,14 @@ export class SchedulerService {
     }
 
     async checkScheduledPosts() {
+        const lockKey = 19770414;
+        const lockResult = await prisma.$queryRaw<
+            Array<{ locked: boolean }>
+        >`SELECT pg_try_advisory_lock(${lockKey}) as locked`;
+        if (!lockResult[0]?.locked) {
+            return;
+        }
+
         try {
             // Run Automations (Plug/DM)
             await automationService.checkTriggers();
@@ -41,6 +49,8 @@ export class SchedulerService {
             }
         } catch (error) {
             logger.error({ err: error }, 'Scheduler failed to check posts');
+        } finally {
+            await prisma.$queryRaw`SELECT pg_advisory_unlock(${lockKey})`;
         }
     }
 

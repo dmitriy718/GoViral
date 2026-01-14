@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { env } from './config/env';
 import { logger } from './utils/logger';
 import { requestId } from './middleware/requestId';
+import { metricsMiddleware, getMetrics } from './middleware/metrics';
 import postRoutes from './routes/post.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import projectRoutes from './routes/project.routes';
@@ -21,6 +22,7 @@ const PORT = env.PORT;
 
 app.use(express.json({ limit: '1mb' }));
 app.use(requestId);
+app.use(metricsMiddleware);
 const allowedOrigins = (env.CORS_ORIGIN || env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim())
@@ -65,6 +67,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
+});
+
+app.get('/metrics', (req, res) => {
+  res.json(getMetrics());
 });
 
 app.listen(PORT, () => {

@@ -1,21 +1,10 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
 import { logger } from '../utils/logger';
 
 export const reportError = async (req: Request, res: Response) => {
     try {
         const errorData = req.body;
         const timestamp = new Date().toISOString();
-        const logDir = path.join(__dirname, '../../logged_errors');
-
-        // Ensure log directory exists
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir, { recursive: true });
-        }
-
-        const logFile = path.join(logDir, `error_report_${timestamp.replace(/[:.]/g, '-')}.json`);
-
         const report = {
             timestamp,
             ...errorData,
@@ -31,8 +20,7 @@ export const reportError = async (req: Request, res: Response) => {
             ip: req.ip
         }, 'Critical client error reported');
 
-        // 2. Save to Disk (Simulating Email/Persistence)
-        fs.writeFileSync(logFile, JSON.stringify(report, null, 2));
+        // Disk persistence removed for production safety.
 
         res.json({ success: true, message: 'Error reported successfully', ticketId: timestamp });
     } catch (err) {

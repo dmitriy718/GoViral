@@ -12,6 +12,7 @@ const envSchema = z.object({
   CLIENT_URL: z.string().optional(),
   CORS_ORIGIN: z.string().optional(),
   ENCRYPTION_KEY: z.string().optional(),
+  ENCRYPTION_KEY_OLD: z.string().optional(),
   MOCK_MODE: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_SERVICE_ACCOUNT: z.string().optional(),

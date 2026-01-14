@@ -27,7 +27,7 @@ const safeJoin = (base, target) => {
   return targetPath;
 };
 
-const serveFile = (filePath, res) => {
+const serveFile = (filePath, res, cacheControl) => {
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.writeHead(404);
@@ -35,7 +35,11 @@ const serveFile = (filePath, res) => {
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
+    const headers = { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' };
+    if (cacheControl) {
+      headers['Cache-Control'] = cacheControl;
+    }
+    res.writeHead(200, headers);
     res.end(data);
   });
 };
@@ -52,7 +56,8 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (!err && stats.isFile()) {
-      return serveFile(filePath, res);
+      const cacheControl = urlPath.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=600';
+      return serveFile(filePath, res, cacheControl);
     }
     const indexPath = safeJoin(rootDir, '/index.html');
     if (!indexPath) {
@@ -60,7 +65,7 @@ const server = http.createServer((req, res) => {
       res.end('Server Error');
       return;
     }
-    serveFile(indexPath, res);
+    serveFile(indexPath, res, 'no-cache');
   });
 });
 
