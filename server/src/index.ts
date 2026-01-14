@@ -21,7 +21,7 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = env.PORT;
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 const allowedOrigins = (env.CORS_ORIGIN || env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim())
