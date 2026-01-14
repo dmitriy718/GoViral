@@ -11,13 +11,13 @@ const run = async () => {
     const socials = await prisma.socialAccount.findMany();
     for (const account of socials) {
         const updatedAccess = reencryptValue(account.accessToken);
-        const updatedRefresh = account.refreshToken ? reencryptValue(account.refreshToken) : null;
+        const data: { accessToken: string; refreshToken?: string } = { accessToken: updatedAccess };
+        if (account.refreshToken) {
+            data.refreshToken = reencryptValue(account.refreshToken);
+        }
         await prisma.socialAccount.update({
             where: { id: account.id },
-            data: {
-                accessToken: updatedAccess,
-                refreshToken: updatedRefresh
-            }
+            data
         });
     }
 
