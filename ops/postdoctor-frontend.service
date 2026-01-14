@@ -8,7 +8,7 @@ WorkingDirectory=/opt/postdoctor/client
 Environment=FRONTEND_ROOT=/opt/postdoctor/client/current
 Environment=FRONTEND_HOST=127.0.0.1
 Environment=FRONTEND_PORT=4173
-ExecStart=/usr/bin/node /opt/postdoctor/client/scripts/static-server.js
+ExecStart=/usr/bin/node /opt/postdoctor/client/scripts/static-server.cjs
 Restart=always
 RestartSec=5
 User=postdoctor
