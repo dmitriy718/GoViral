@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { addCompetitor, getCompetitors, getDashboardStats, getTrends, connectProvider, getSocialAccounts } from '@/lib/api';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useAuth } from '@/context/AuthContext';
 
 import { SEO } from '@/components/seo/SEO';
 
@@ -38,6 +39,7 @@ const CHART_DATA = [
 export function Dashboard() {
     const mockMode = import.meta.env.VITE_MOCK_MODE === 'true';
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [competitors, setCompetitors] = useState<Competitor[]>([]);
     const [loadingComps, setLoadingComps] = useState(false);
 
@@ -52,11 +54,12 @@ export function Dashboard() {
     const [connectedPlatforms, setConnectedPlatforms] = useState<string[]>([]);
 
     useEffect(() => {
+        if (!user) return;
         loadCompetitors();
         loadStats();
         loadTrends();
         loadSocials();
-    }, []);
+    }, [user]);
 
     const loadSocials = async () => {
         try {
@@ -218,23 +221,29 @@ export function Dashboard() {
                             </div>
                         </div>
                         <div className="flex-1 w-full min-h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={chartData}>
-                                    <defs>
-                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <XAxis dataKey="name" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
-                                        itemStyle={{ color: '#fff' }}
-                                    />
-                                    <Area type="monotone" dataKey="value" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                            {chartData.length === 0 ? (
+                                <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                                    No analytics data yet.
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={chartData}>
+                                        <defs>
+                                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <XAxis dataKey="name" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
+                                            itemStyle={{ color: '#fff' }}
+                                        />
+                                        <Area type="monotone" dataKey="value" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
                     </GlassCard>
                 </FadeIn>
