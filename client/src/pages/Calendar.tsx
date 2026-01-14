@@ -1,16 +1,24 @@
 import { ChevronLeft, ChevronRight, GripVertical, Clock, X, Zap, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { DndContext, useDraggable, useDroppable, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable, DragOverlay, closestCenter, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
 import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'react-hot-toast';
-import { savePost, getDrafts } from '@/lib/api';
+import { getDrafts, type Post } from '@/lib/api';
+import { SEO } from '@/components/seo/SEO';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+interface ScheduledPost extends Post {
+    day: number;
+    time?: string;
+    platform: string;
+}
+
 export function Calendar() {
-    const [scheduledPosts, setScheduledPosts] = useState<{ id: string, day: number, content: string, platform: string, time?: string }[]>([]);
-    const [drafts, setDrafts] = useState<any[]>([]);
+    const mockMode = import.meta.env.VITE_MOCK_MODE === 'true';
+    const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
+    const [drafts, setDrafts] = useState<Post[]>([]);
     const [loadingDrafts, setLoadingDrafts] = useState(false);
 
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -27,26 +35,26 @@ export function Calendar() {
         try {
             const data = await getDrafts();
             setDrafts(data);
-        } catch (e) {
+        } catch {
             console.error("Failed to load drafts");
         } finally {
             setLoadingDrafts(false);
         }
     };
 
-    const handleDragStart = (event: any) => {
-        setActiveId(event.active.id);
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(event.active.id as string);
     };
 
-    const handleDragEnd = (event: any) => {
+    const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         setActiveId(null);
 
-        if (over && over.id.startsWith('day-')) {
-            const day = parseInt(over.id.replace('day-', ''));
+        if (over && (over.id as string).startsWith('day-')) {
+            const day = parseInt((over.id as string).replace('day-', ''));
             const draft = drafts.find(d => d.id === active.id) ||
                 // Also check viral drops if any
-                VIRAL_DROPS.find(d => d.id === active.id);
+                (VIRAL_DROPS.find(d => d.id === active.id) as unknown as Post);
 
             if (draft) {
                 setPendingDrop({ id: draft.id, day });
@@ -60,7 +68,7 @@ export function Calendar() {
             const draft = drafts.find(d => d.id === pendingDrop.id);
             if (draft) {
                 // Ideally call API to update status to SCHEDULED here
-                setScheduledPosts([...scheduledPosts, { ...draft, day: pendingDrop.day, time: scheduleTime }]);
+                setScheduledPosts([...scheduledPosts, { ...draft, day: pendingDrop.day, time: scheduleTime, platform: (draft as unknown as { platform: string }).platform || 'twitter' }]);
                 setDrafts(drafts.filter(d => d.id !== draft.id)); // Remove from drafts
                 toast.success("Post scheduled!");
             }
@@ -69,23 +77,50 @@ export function Calendar() {
         setPendingDrop(null);
     };
 
-    const VIRAL_DROPS = [
-        { id: 'v1', content: "Stop scrolling. Read this if you want to scale. 🛑 #GrowthHacking", platform: 'twitter', isViral: true },
-        { id: 'v2', content: "My morning routine for max productivity (Thread) 🧵", platform: 'linkedin', isViral: true },
-        { id: 'v3', content: "POV: You just hit $10k MRR. 🍾", platform: 'instagram', isViral: true },
-    ];
+    const VIRAL_DROPS = mockMode ? [
+        { id: 'v1', content: "Stop scrolling. Read this if you want to scale. 🛑 #GrowthHacking", platform: 'twitter', isViral: true, status: 'DRAFT' },
+        { id: 'v2', content: "My morning routine for max productivity (Thread) 🧵", platform: 'linkedin', isViral: true, status: 'DRAFT' },
+        { id: 'v3', content: "POV: You just hit $10k MRR. 🍾", platform: 'instagram', isViral: true, status: 'DRAFT' },
+    ] : [];
+
+
+
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const getDaysInMonth = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    };
+
+    const getFirstDayOfMonth = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    };
+
+    const nextMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+    };
+
+    const prevMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+    };
+
+    const daysInMonth = getDaysInMonth(currentDate);
+    const startPadding = getFirstDayOfMonth(currentDate);
+    const endPadding = 42 - (daysInMonth + startPadding); // Ensure 6 rows for consistency
 
     return (
         <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
+            <SEO title="Calendar" description="Schedule your viral posts." />
             <div className="flex h-screen overflow-hidden">
                 {/* Main Calendar Area */}
                 <div className="flex-1 p-8 flex flex-col h-full overflow-hidden">
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-3xl font-bold tracking-tight text-white text-glow">Calendar</h1>
                         <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-lg p-1">
-                            <button className="p-2 hover:bg-white/10 rounded-md text-white"><ChevronLeft className="w-4 h-4" /></button>
-                            <span className="font-semibold w-32 text-center text-white">October 2023</span>
-                            <button className="p-2 hover:bg-white/10 rounded-md text-white"><ChevronRight className="w-4 h-4" /></button>
+                            <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-md text-white"><ChevronLeft className="w-4 h-4" /></button>
+                            <span className="font-semibold w-40 text-center text-white">
+                                {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                            </span>
+                            <button onClick={nextMonth} className="p-2 hover:bg-white/10 rounded-md text-white"><ChevronRight className="w-4 h-4" /></button>
                         </div>
                     </div>
 
@@ -101,18 +136,18 @@ export function Calendar() {
 
                         {/* Grid */}
                         <div className="grid grid-cols-7 flex-1 auto-rows-fr">
-                            {Array.from({ length: 3 }).map((_, i) => ( // Start padding
-                                <div key={`empty-${i}`} className="border-b border-r border-white/10 bg-black/20" />
+                            {Array.from({ length: startPadding }).map((_, i) => (
+                                <div key={`empty-start-${i}`} className="border-b border-r border-white/10 bg-black/20" />
                             ))}
-                            {Array.from({ length: 31 }).map((_, i) => (
+                            {Array.from({ length: daysInMonth }).map((_, i) => (
                                 <CalendarDay
                                     key={i + 1}
                                     day={i + 1}
                                     posts={scheduledPosts.filter(p => p.day === i + 1)}
                                 />
                             ))}
-                            {Array.from({ length: 8 }).map((_, i) => ( // End padding
-                                <div key={`end-${i}`} className="border-b border-r border-white/10 bg-black/20" />
+                            {Array.from({ length: endPadding > 0 ? endPadding : 0 }).map((_, i) => (
+                                <div key={`empty-end-${i}`} className="border-b border-r border-white/10 bg-black/20" />
                             ))}
                         </div>
                     </div>
@@ -142,7 +177,7 @@ export function Calendar() {
                     </h2>
                     <div className="space-y-3">
                         {VIRAL_DROPS.map((viral) => (
-                            <DraggableDraft key={viral.id} draft={viral} />
+                            <DraggableDraft key={viral.id} draft={viral as unknown as Post} />
                         ))}
                     </div>
                 </div>
@@ -207,7 +242,7 @@ export function Calendar() {
     );
 }
 
-function CalendarDay({ day, posts }: { day: number, posts: any[] }) {
+function CalendarDay({ day, posts }: { day: number, posts: ScheduledPost[] }) {
     const { setNodeRef, isOver } = useDroppable({
         id: `day-${day}`,
     });
@@ -233,7 +268,7 @@ function CalendarDay({ day, posts }: { day: number, posts: any[] }) {
     );
 }
 
-function DraggableDraft({ draft }: { draft: any }) {
+function DraggableDraft({ draft }: { draft: Post }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: draft.id,
     });
@@ -241,6 +276,8 @@ function DraggableDraft({ draft }: { draft: any }) {
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined;
+
+    const platform = (draft as unknown as { platform: string }).platform || 'twitter';
 
     return (
         <div
@@ -253,10 +290,10 @@ function DraggableDraft({ draft }: { draft: any }) {
             <div className="flex justify-between items-start mb-2">
                 <span className={cn(
                     "text-[10px] uppercase font-bold px-1.5 py-0.5 rounded",
-                    draft.platform === 'twitter' ? "bg-black text-white" :
-                        draft.platform === 'instagram' ? "bg-pink-600 text-white" : "bg-blue-700 text-white"
+                    platform === 'twitter' ? "bg-black text-white" :
+                        platform === 'instagram' ? "bg-pink-600 text-white" : "bg-blue-700 text-white"
                 )}>
-                    {draft.platform}
+                    {platform}
                 </span>
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2 group-hover:text-white transition-colors">{draft.content}</p>

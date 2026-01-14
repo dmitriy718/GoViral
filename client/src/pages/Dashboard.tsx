@@ -1,25 +1,105 @@
 import { useNavigate } from 'react-router-dom';
-import { GlassCard, FadeIn, PageHeader } from '@/components/ui/design-system';
-import { TrendingUp, Users, Activity, Target, Zap, Eye, MoreHorizontal, Loader2 } from 'lucide-react';
+import { GlassCard, FadeIn, PageHeader, Button } from '@/components/ui/design-system';
+import { TrendingUp, Users, Activity, Target, Zap, Eye, MoreHorizontal, Loader2, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
-import { addCompetitor, getCompetitors } from '@/lib/api';
+import { addCompetitor, getCompetitors, getDashboardStats, getTrends, connectProvider, getSocialAccounts } from '@/lib/api';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+import { SEO } from '@/components/seo/SEO';
+
+interface SocialAccount {
+    provider: string;
+    username?: string;
+    connected: boolean;
+}
+
+interface Competitor {
+    handle: string;
+    lastPost?: string;
+    analysis?: {
+        bestTime: string;
+        engagementRate: string;
+        topHashtags: string[];
+    };
+}
+
+const CHART_DATA = [
+    { name: 'Mon', value: 400 },
+    { name: 'Tue', value: 300 },
+    { name: 'Wed', value: 600 },
+    { name: 'Thu', value: 800 },
+    { name: 'Fri', value: 700 },
+    { name: 'Sat', value: 900 },
+    { name: 'Sun', value: 1000 },
+];
 
 export function Dashboard() {
+    const mockMode = import.meta.env.VITE_MOCK_MODE === 'true';
     const navigate = useNavigate();
-    const [competitors, setCompetitors] = useState<any[]>([]);
+    const [competitors, setCompetitors] = useState<Competitor[]>([]);
     const [loadingComps, setLoadingComps] = useState(false);
+
+
+    const [stats, setStats] = useState({
+        viralScore: 0,
+        estRoi: 0,
+        totalReach: 0,
+        activePersonas: 0
+    });
+    const [trends, setTrends] = useState<{ topic: string, vol: string, sentiment: string, growth: string }[]>([]);
+    const [connectedPlatforms, setConnectedPlatforms] = useState<string[]>([]);
 
     useEffect(() => {
         loadCompetitors();
+        loadStats();
+        loadTrends();
+        loadSocials();
     }, []);
+
+    const loadSocials = async () => {
+        try {
+            const accounts = await getSocialAccounts();
+            setConnectedPlatforms(accounts.map((a: SocialAccount) => a.provider));
+        } catch {
+            console.error("Failed to load social accounts");
+        }
+    };
+
+    const handleConnect = async (provider: string) => {
+        try {
+            await connectProvider(provider);
+            toast.success(`Connected to ${provider}`);
+            loadSocials();
+        } catch {
+            toast.error(`Failed to connect to ${provider}`);
+        }
+    };
+
+    const loadTrends = async () => {
+        try {
+            const data = await getTrends();
+            setTrends(data);
+        } catch {
+            console.error("Failed to load trends");
+        }
+    };
+
+    const loadStats = async () => {
+        try {
+            const data = await getDashboardStats();
+            setStats(data);
+        } catch {
+            console.error("Failed to load dashboard stats");
+        }
+    };
 
     const loadCompetitors = async () => {
         try {
             const data = await getCompetitors();
             setCompetitors(data);
-        } catch (e) {
+        } catch {
             console.error("Failed to load competitors");
         }
     };
@@ -33,7 +113,7 @@ export function Dashboard() {
             await addCompetitor(handle);
             toast.success(`Tracking started for ${handle}`);
             loadCompetitors();
-        } catch (e) {
+        } catch {
             toast.error("Failed to add competitor");
         } finally {
             setLoadingComps(false);
@@ -41,155 +121,195 @@ export function Dashboard() {
     };
 
     const PLATFORMS_STATUS = [
-        { id: 'twitter', name: 'X (Twitter)', connected: true, color: 'bg-black' },
-        { id: 'linkedin', name: 'LinkedIn', connected: true, color: 'bg-blue-700' },
-        { id: 'instagram', name: 'Instagram', connected: false, color: 'bg-pink-600' },
-        { id: 'facebook', name: 'Facebook', connected: false, color: 'bg-blue-600' },
-        { id: 'reddit', name: 'Reddit', connected: true, color: 'bg-orange-500' },
-        { id: 'discord', name: 'Discord', connected: false, color: 'bg-indigo-500' },
-        { id: 'slack', name: 'Slack', connected: false, color: 'bg-purple-600' },
-        { id: 'email', name: 'Email', connected: true, color: 'bg-green-600' },
+        { id: 'twitter', name: 'X (Twitter)', icon: '𝕏', color: 'bg-black' },
+        { id: 'linkedin', name: 'LinkedIn', icon: 'in', color: 'bg-[#0077b5]' },
+        { id: 'instagram', name: 'Instagram', icon: '📸', color: 'bg-gradient-to-tr from-yellow-400 to-purple-600' },
+        { id: 'facebook', name: 'Facebook', icon: 'f', color: 'bg-[#1877F2]' },
+        { id: 'reddit', name: 'Reddit', icon: 'r/', color: 'bg-[#FF4500]' },
     ];
+    const chartData = mockMode ? CHART_DATA : [];
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <SEO title="Dashboard" description="Monitor your viral performance and track key metrics." />
             <div className="flex justify-between items-center">
                 <PageHeader title="Command Center" subtitle="Welcome back, Mastermind." />
-                <button
+                <Button
                     onClick={() => navigate('/wizard')}
-                    className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(99,102,241,0.5)] hover:shadow-[0_0_25px_rgba(99,102,241,0.7)] flex items-center gap-2"
+                    className="gap-2"
                 >
                     <Zap className="w-4 h-4" /> New Campaign
-                </button>
+                </Button>
             </div>
 
-            {/* Platform Health Check */}
+            {/* Platform Matrix */}
             <FadeIn>
                 <GlassCard className="p-6">
                     <h3 className="text-lg font-bold text-white mb-4">Platform Matrix</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                        {PLATFORMS_STATUS.map((p) => (
-                            <div key={p.id} className={cn(
-                                "relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300",
-                                p.connected
-                                    ? "bg-green-500/10 border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
-                                    : "bg-red-500/5 border-red-500/20 opacity-70 hover:opacity-100 hover:bg-red-500/10"
-                            )}>
-                                <div className={cn("w-3 h-3 rounded-full absolute top-2 right-2", p.connected ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center mb-2 text-white font-bold", p.color)}>
-                                    {p.name[0]}
-                                </div>
-                                <span className="text-xs font-medium text-white">{p.name}</span>
-                                <span className={cn("text-[10px] mt-1", p.connected ? "text-green-400" : "text-red-400")}>
-                                    {p.connected ? 'Online' : 'Disconnected'}
-                                </span>
-                            </div>
-                        ))}
+                    <div className="flex gap-4 overflow-x-auto pb-2">
+                        {PLATFORMS_STATUS.map((p) => {
+                            const isConnected = connectedPlatforms.includes(p.id);
+                            return (
+                                <button
+                                    key={p.id}
+                                    onClick={() => handleConnect(p.id)}
+                                    className={cn(
+                                        "flex items-center gap-3 px-4 py-3 rounded-xl border min-w-[160px] transition-all duration-300",
+                                        isConnected
+                                            ? "bg-white/5 border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.1)]"
+                                            : "bg-white/5 border-white/5 opacity-60 hover:opacity-100 hover:bg-white/10"
+                                    )}>
+                                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm", p.color)}>
+                                        {p.icon}
+                                    </div>
+                                    <div className="text-left">
+                                        <div className="text-xs font-semibold text-white">{p.name}</div>
+                                        <div className={cn("text-[10px] flex items-center gap-1", isConnected ? "text-green-400" : "text-muted-foreground")}>
+                                            <div className={cn("w-1.5 h-1.5 rounded-full", isConnected ? "bg-green-500 animate-pulse" : "bg-gray-600")} />
+                                            {isConnected ? 'Active' : 'Connect'}
+                                        </div>
+                                    </div>
+                                </button>
+                            )
+                        })}
                     </div>
                 </GlassCard>
             </FadeIn>
 
-            {/* Feature 1 & 10: Viral Score & ROI Stats */}
+            {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
-                    { label: 'Viral Score™ Avg', val: '88/100', change: '+5%', icon: Activity, color: 'text-green-400' },
-                    { label: 'Est. ROI Value', val: '$12,450', change: '+$2.1k', icon: Target, color: 'text-blue-400' },
-                    { label: 'Total Reach', val: '1.2M', change: '+15%', icon: Eye, color: 'text-purple-400' },
-                    { label: 'Active Personas', val: '4', change: 'All Health', icon: Users, color: 'text-pink-400' },
+                    { label: 'Viral Score™', val: `${stats.viralScore}/100`, change: '+12%', icon: Activity, color: 'text-primary' },
+                    { label: 'Est. ROI', val: `$${stats.estRoi}`, change: '+$420', icon: Target, color: 'text-green-400' },
+                    { label: 'Total Reach', val: `${stats.totalReach}`, change: '+2.4k', icon: Eye, color: 'text-purple-400' },
+                    { label: 'Personas', val: `${stats.activePersonas}`, change: 'Active', icon: Users, color: 'text-pink-400' },
                 ].map((stat, i) => (
                     <FadeIn key={i} delay={i * 0.1}>
-                        <GlassCard hoverEffect className="p-5 flex flex-col justify-between h-32">
-                            <div className="flex justify-between items-start">
-                                <div className={`p-2 rounded-lg bg-white/5 ${stat.color}`}>
+                        <GlassCard hoverEffect className="p-5 flex flex-col justify-between h-36 relative overflow-hidden group">
+                            <div className="flex justify-between items-start relative z-10">
+                                <div className={`p-2.5 rounded-xl bg-white/5 border border-white/5 ${stat.color}`}>
                                     <stat.icon className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-1 rounded-full">{stat.change}</span>
+                                <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-1 rounded-full border border-green-400/20">{stat.change}</span>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-bold text-white">{stat.val}</h3>
-                                <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</p>
+                            <div className="relative z-10">
+                                <h3 className="text-3xl font-bold text-white tracking-tight">{stat.val}</h3>
+                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">{stat.label}</p>
                             </div>
+                            {/* Decorative gradient blob */}
+                            <div className={`absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-current to-transparent opacity-10 blur-2xl rounded-full ${stat.color.replace('text-', 'text-')}`} />
                         </GlassCard>
                     </FadeIn>
                 ))}
             </div>
 
+            {/* Analytics & Trends Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Feature 4: Trend Watch */}
+                {/* Main Analytics Chart */}
                 <FadeIn delay={0.4} className="lg:col-span-2">
-                    <GlassCard className="h-full">
-                        <div className="flex justify-between items-center mb-6">
+                    <GlassCard className="h-full min-h-[400px] flex flex-col">
+                        <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-secondary" /> Trend Watch
+                                <TrendingUp className="w-5 h-5 text-primary" /> Growth Analytics
                             </h3>
-                            <button className="text-xs text-primary hover:text-white transition-colors">View All</button>
+                            <div className="flex gap-2">
+                                <button className="text-xs px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">7D</button>
+                                <button className="text-xs px-3 py-1.5 rounded-lg bg-transparent text-muted-foreground hover:bg-white/5 transition-colors">30D</button>
+                            </div>
                         </div>
-                        <div className="space-y-4">
-                            {[
-                                { topic: "#GenerativeAI", vol: "2.4M posts", sentiment: "Positive", growth: "+120%" },
-                                { topic: "Sustainable Tech", vol: "850k posts", sentiment: "Neutral", growth: "+45%" },
-                                { topic: "Remote Work 2.0", vol: "500k posts", sentiment: "Mixed", growth: "+12%" },
-                            ].map((trend, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors cursor-pointer group">
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-lg font-bold text-white/50 group-hover:text-primary transition-colors">0{i + 1}</span>
-                                        <div>
-                                            <h4 className="font-semibold text-white">{trend.topic}</h4>
-                                            <p className="text-xs text-muted-foreground">{trend.vol} • {trend.sentiment}</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="block text-green-400 font-bold">{trend.growth}</span>
-                                        <span className="text-xs text-muted-foreground">velocity</span>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="flex-1 w-full min-h-[300px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData}>
+                                    <defs>
+                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="name" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                    <Area type="monotone" dataKey="value" stroke="#818cf8" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
                         </div>
                     </GlassCard>
                 </FadeIn>
 
-                {/* Feature 2: Competitor Spy */}
-                <FadeIn delay={0.5}>
-                    <GlassCard className="h-full">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                <Eye className="w-5 h-5 text-red-400" /> Competitor Spy
-                            </h3>
-                            <button className="p-1 hover:bg-white/10 rounded"><MoreHorizontal className="w-4 h-4 text-muted-foreground" /></button>
-                        </div>
-                        <div className="space-y-6">
-                            {competitors.length === 0 ? (
-                                <p className="text-center text-sm text-muted-foreground py-4">No competitors tracked yet.</p>
-                            ) : (
-                                competitors.map((comp, i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-white/10 flex items-center justify-center text-xs font-bold text-white">
-                                            {comp.handle[1]}
-                                        </div>
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-medium text-white flex justify-between">
-                                                {comp.handle}
-                                                <span className="text-[10px] text-muted-foreground">{comp.lastPost}</span>
-                                            </h4>
-                                            <div className="w-full bg-white/5 h-1.5 rounded-full mt-2 overflow-hidden">
-                                                <div className="bg-red-500/50 h-full rounded-full" style={{ width: `${Math.random() * 60 + 20}%` }} />
+                {/* Right Column: Trends & Competitors */}
+                <div className="space-y-8">
+                    {/* Feature 4: Trend Watch */}
+                    <FadeIn delay={0.5}>
+                        <GlassCard>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-yellow-400" /> Trending Now
+                                </h3>
+                            </div>
+                            <div className="space-y-3">
+                                {trends.length === 0 ? (
+                                    <p className="text-center text-sm text-muted-foreground py-4">Loading trends...</p>
+                                ) : (
+                                    trends.slice(0, 3).map((trend, i) => (
+                                        <div key={i} className="group flex items-center justify-between p-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/5 transition-all cursor-pointer">
+                                            <div>
+                                                <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">{trend.topic}</h4>
+                                                <p className="text-xs text-muted-foreground">{trend.vol} • {trend.sentiment}</p>
                                             </div>
-                                            <p className="text-[10px] text-muted-foreground mt-1">Engagement Heatmap</p>
+                                            <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors" />
                                         </div>
-                                    </div>
-                                ))
-                            )}
+                                    )))}
+                            </div>
+                        </GlassCard>
+                    </FadeIn>
 
-                            <button
-                                onClick={handleAddCompetitor}
-                                disabled={loadingComps}
-                                className="w-full py-2 text-sm text-center border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-muted-foreground hover:text-white flex items-center justify-center gap-2"
-                            >
-                                {loadingComps ? <Loader2 className="w-3 h-3 animate-spin" /> : '+ Add Competitor'}
-                            </button>
-                        </div>
-                    </GlassCard>
-                </FadeIn>
+                    {/* Feature 2: Competitor Spy */}
+                    <FadeIn delay={0.6}>
+                        <GlassCard>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Eye className="w-5 h-5 text-red-400" /> Competitors
+                                </h3>
+                                <button className="p-1 hover:bg-white/10 rounded"><MoreHorizontal className="w-4 h-4 text-muted-foreground" /></button>
+                            </div>
+                            <div className="space-y-4">
+                                {competitors.length === 0 ? (
+                                    <div className="text-center py-6">
+                                        <p className="text-sm text-muted-foreground mb-3">No competitors tracked.</p>
+                                    </div>
+                                ) : (
+                                    competitors.slice(0, 3).map((comp, i) => (
+                                        <div key={i} className="flex flex-col gap-2 p-3 bg-black/20 rounded-lg border border-white/5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium text-sm text-white">{comp.handle}</span>
+                                                <span className="text-[10px] text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded">Active</span>
+                                            </div>
+                                            {comp.analysis && (
+                                                <div className="flex gap-2 mt-1">
+                                                    {comp.analysis.topHashtags.slice(0, 2).map((tag) => (
+                                                        <span key={tag} className="text-[10px] text-muted-foreground bg-white/5 px-1.5 py-0.5 rounded">{tag}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                                
+                                <Button 
+                                    variant="outline" 
+                                    className="w-full text-xs h-9"
+                                    onClick={handleAddCompetitor}
+                                    disabled={loadingComps}
+                                >
+                                    {loadingComps ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : '+ Track Competitor'}
+                                </Button>
+                            </div>
+                        </GlassCard>
+                    </FadeIn>
+                </div>
             </div>
         </div>
     );
