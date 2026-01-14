@@ -1,4 +1,6 @@
 import { prisma } from '../utils/prisma';
+import { env } from '../config/env';
+import { logger } from '../utils/logger';
 
 export class CompetitorService {
     
@@ -13,10 +15,22 @@ export class CompetitorService {
     }
 
     async analyze(competitorId: string) {
-        console.log('[Competitor] Analyzing:', competitorId);
+        logger.info({ competitorId }, 'Competitor analysis started');
         
         const competitor = await prisma.competitor.findUnique({ where: { id: competitorId } });
         if (!competitor) throw new Error('Competitor not found');
+
+        if (env.MOCK_MODE !== 'true') {
+            await prisma.competitor.update({
+                where: { id: competitorId },
+                data: {
+                    status: 'Pending',
+                    lastPost: 'Unknown',
+                    analysis: null
+                }
+            });
+            return null;
+        }
 
         // Mock Analysis Logic
         const mockAnalysis = {

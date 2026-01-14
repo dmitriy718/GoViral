@@ -1,15 +1,20 @@
 import { Post } from '@prisma/client';
 import { prisma } from '../utils/prisma';
+import { env } from '../config/env';
+import { logger } from '../utils/logger';
 
 export class AutomationService {
     
     // Called by the scheduler every minute (simulated)
     async checkTriggers() {
+        if (env.MOCK_MODE !== 'true') {
+            return;
+        }
         // 1. Check Auto-Plug Triggers
         // Find posts that are PUBLISHED, have autoPlugEnabled, and are NOT yet plugged (we need a flag or check comments)
         // For simplicity, we'll assume we check 'options' JSON or add a status.
         // Actually, let's just log for MVP simulation.
-        console.log('[Automation] Checking for Auto-Plug candidates...');
+        logger.info('Checking for Auto-Plug candidates');
         
         const activePlugs = await prisma.post.findMany({
             where: {
@@ -24,7 +29,7 @@ export class AutomationService {
         }
 
         // 2. Check Auto-DM Triggers
-        console.log('[Automation] Checking for Auto-DM candidates...');
+        logger.info('Checking for Auto-DM candidates');
         const activeDMs = await prisma.post.findMany({
             where: {
                 status: 'PUBLISHED',
@@ -41,10 +46,10 @@ export class AutomationService {
         // Mock API call to get engagement
         const currentLikes = Math.floor(Math.random() * 100); // Random simulation
         
-        console.log(`[AutoPlug] Post ${post.id}: ${currentLikes}/${post.autoPlugThreshold} likes.`);
+        logger.info({ postId: post.id, currentLikes, threshold: post.autoPlugThreshold }, 'AutoPlug check');
 
         if (currentLikes >= post.autoPlugThreshold) {
-            console.log(`[AutoPlug] 🚀 TRIGGERED! Replying with: ${post.autoPlugContent}`);
+            logger.info({ postId: post.id }, 'AutoPlug triggered');
             
             // In real app: await socialApi.reply(post.platformId, post.autoPlugContent);
             
@@ -67,11 +72,11 @@ export class AutomationService {
         const keyword = post.autoDmKeyword?.toLowerCase();
         if (!keyword) return;
 
-        console.log(`[AutoDM] Scanning comments on Post ${post.id} for "${keyword}"...`);
+        logger.info({ postId: post.id, keyword }, 'AutoDM scanning comments');
 
         for (const comment of mockComments) {
             if (comment.text.toLowerCase().includes(keyword)) {
-                console.log(`[AutoDM] 📬 SENDING DM to ${comment.user}: "${post.autoDmContent}"`);
+                logger.info({ postId: post.id, user: comment.user }, 'AutoDM send');
                 // In real app: await socialApi.sendDM(comment.user, post.autoDmContent);
             }
         }

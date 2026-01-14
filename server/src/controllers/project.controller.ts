@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 
 
 export const createProject = async (req: Request, res: Response) => {
@@ -27,7 +28,7 @@ export const createProject = async (req: Request, res: Response) => {
 
         res.json(project);
     } catch (error) {
-        console.error('Create project error:', error);
+        logger.error({ err: error }, 'Create project error');
         res.status(500).json({ error: 'Failed to create project' });
     }
 };
@@ -50,7 +51,7 @@ export const getProjects = async (req: Request, res: Response) => {
 
         res.json(formatted);
     } catch (error) {
-        console.error('Get projects error:', error);
+        logger.error({ err: error }, 'Get projects error');
         res.status(500).json({ error: 'Failed to fetch projects' });
     }
 };

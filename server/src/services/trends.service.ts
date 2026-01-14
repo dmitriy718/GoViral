@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { logger } from '../utils/logger';
 
 interface Trend {
     topic: string;
@@ -33,7 +34,7 @@ export class TrendsService {
             }));
 
         } catch (error) {
-            console.error('NewsAPI fetch failed:', error);
+            logger.error({ err: error }, 'NewsAPI fetch failed');
             return this.getMockTrends();
         }
     }

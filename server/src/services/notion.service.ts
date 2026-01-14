@@ -1,11 +1,14 @@
 import { Integration } from '@prisma/client';
 import { prisma } from '../utils/prisma';
+import { encrypt, decrypt } from '../utils/crypto';
+import { env } from '../config/env';
+import { logger } from '../utils/logger';
 
 export class NotionService {
     
     async connect(userId: string, config: { databaseId: string, accessToken: string }) {
         // In real app: Verify with Notion API first
-        console.log('[Notion] Connecting database:', config.databaseId);
+        logger.info({ databaseId: config.databaseId }, 'Notion connect');
 
         return prisma.integration.upsert({
             where: {
@@ -15,19 +18,19 @@ export class NotionService {
                 }
             },
             update: {
-                config: JSON.stringify(config),
+                config: encrypt(JSON.stringify(config)),
                 updatedAt: new Date()
             },
             create: {
                 userId,
                 type: 'NOTION',
-                config: JSON.stringify(config)
+                config: encrypt(JSON.stringify(config))
             }
         });
     }
 
     async sync(userId: string) {
-        console.log('[Notion] Syncing for user:', userId);
+        logger.info({ userId }, 'Notion sync');
 
         const integration = await prisma.integration.findUnique({
             where: {
@@ -40,7 +43,17 @@ export class NotionService {
 
         if (!integration) throw new Error('Notion not connected');
 
-        const config = JSON.parse(integration.config);
+        const rawConfig = decrypt(integration.config);
+        const config = JSON.parse(rawConfig);
+
+        if (env.MOCK_MODE !== 'true') {
+            // Real Notion sync not implemented yet
+            await prisma.integration.update({
+                where: { id: integration.id },
+                data: { lastSyncedAt: new Date() }
+            });
+            return { synced: 0 };
+        }
         
         // Mock Notion API Response
         const mockNotionPages = [

@@ -1,5 +1,6 @@
 
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 
 
 export const PLAN_LIMITS = {
@@ -50,11 +51,17 @@ export class SubscriptionService {
             // Accounts are absolute, not monthly
             currentUsage = await prisma.socialAccount.count({ where: { userId } });
         } else if (resource === 'aiGenerations') {
-             // Not tracked in DB yet, return mock for now or implement AI log table later.
-             currentUsage = 0; 
+             currentUsage = await prisma.aiGeneration.count({
+                where: {
+                    userId,
+                    createdAt: {
+                        gte: startOfMonth
+                    }
+                }
+             });
         }
 
-        console.log(`[SubscriptionService] User: ${userId}, Plan: ${planName}, Resource: ${resource}, Current: ${currentUsage}, Limit: ${limits?.[resource]}`);
+        logger.info({ userId, plan: planName, resource, currentUsage, limit: limits?.[resource] }, 'Subscription usage check');
 
         // Safe check
         const limit = limits?.[resource] ?? 0;

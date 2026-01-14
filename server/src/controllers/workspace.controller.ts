@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 
 
 const PLAN_LIMITS = {
@@ -36,10 +37,10 @@ export const createWorkspace = async (req: Request, res: Response) => {
         // Admin Bypass Logic
         const isAdmin = user.email === 'admin@postdoctor.app';
 
-        console.log(`[CreateWorkspace] User: ${user.email}, Plan: ${plan}, Limit: ${limit}, Owned: ${ownedCount}, Admin: ${isAdmin}`);
+        logger.info({ email: user.email, plan, limit, ownedCount, isAdmin }, 'CreateWorkspace check');
 
         if (!isAdmin && ownedCount >= limit) {
-            console.log('[CreateWorkspace] Limit reached.');
+            logger.warn({ email: user.email }, 'CreateWorkspace limit reached');
             return res.status(403).json({
                 error: `Plan limit reached. You can only create ${limit} workspace(s) on the ${plan} plan.`
             });
@@ -65,7 +66,7 @@ export const createWorkspace = async (req: Request, res: Response) => {
         res.json(workspace);
 
     } catch (error) {
-        console.error('Create workspace error:', error);
+        logger.error({ err: error }, 'Create workspace error');
         res.status(500).json({ error: 'Failed to create workspace' });
     }
 };
@@ -82,7 +83,7 @@ export const getWorkspaces = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            console.log(`[GetWorkspaces] User ${userPayload.email} not found in DB. Auto-creating...`);
+            logger.info({ email: userPayload.email }, 'GetWorkspaces user auto-create');
             user = await prisma.user.create({
                 data: {
                     id: userPayload.uid, // Explicitly use Firebase UID
@@ -153,7 +154,7 @@ export const getWorkspaces = async (req: Request, res: Response) => {
 
         res.json(workspaces);
     } catch (error) {
-        console.error('Get workspaces error:', error);
+        logger.error({ err: error }, 'Get workspaces error');
         res.status(500).json({ error: 'Failed to fetch workspaces' });
     }
 };

@@ -1,0 +1,16 @@
+[Unit]
+Description=PostDoctor Worker
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/postdoctor/server
+EnvironmentFile=/opt/postdoctor/server/.env
+ExecStart=/usr/bin/node /opt/postdoctor/server/dist/worker.js
+Restart=always
+RestartSec=5
+User=postdoctor
+Group=postdoctor
+
+[Install]
+WantedBy=multi-user.target

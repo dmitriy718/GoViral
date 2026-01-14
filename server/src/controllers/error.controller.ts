@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { logger } from '../utils/logger';
 
 export const reportError = async (req: Request, res: Response) => {
     try {
@@ -23,19 +24,19 @@ export const reportError = async (req: Request, res: Response) => {
         };
 
         // 1. Log to Console (Immediate Visibility)
-        console.error('CRITICAL CLIENT ERROR REPORTED:', {
+        logger.error({
             timestamp,
             message: errorData?.message,
             url: errorData?.url,
             ip: req.ip
-        });
+        }, 'Critical client error reported');
 
         // 2. Save to Disk (Simulating Email/Persistence)
         fs.writeFileSync(logFile, JSON.stringify(report, null, 2));
 
         res.json({ success: true, message: 'Error reported successfully', ticketId: timestamp });
     } catch (err) {
-        console.error('Failed to process error report:', err);
+        logger.error({ err }, 'Failed to process error report');
         res.status(500).json({ error: 'Failed to report error' });
     }
 };

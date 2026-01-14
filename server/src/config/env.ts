@@ -10,6 +10,8 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().min(1, "OpenAI API Key is required"),
   CLIENT_URL: z.string().optional(),
   CORS_ORIGIN: z.string().optional(),
+  ENCRYPTION_KEY: z.string().optional(),
+  MOCK_MODE: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_SERVICE_ACCOUNT: z.string().optional(),
   ALLOW_MOCK_AUTH: z.string().optional(),

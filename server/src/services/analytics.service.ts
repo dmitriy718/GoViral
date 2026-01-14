@@ -1,5 +1,6 @@
 
 import { prisma } from '../utils/prisma';
+import { env } from '../config/env';
 
 export class AnalyticsService {
     async getDashboardStats(userId: string) {
@@ -22,6 +23,13 @@ export class AnalyticsService {
     }
 
     async getDetailedReport(userId: string, dateRange: string = '7d') {
+        if (env.MOCK_MODE !== 'true') {
+            return {
+                engagementHistory: [],
+                demographics: {},
+                topPosts: []
+            };
+        }
         const posts = await prisma.post.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },

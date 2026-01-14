@@ -9,9 +9,14 @@ const ACTIVITIES = [
     { id: 5, action: "New Member", details: "Sarah Smith joined the team", time: "3 days ago", status: "success" },
 ];
 
+import { SEO } from '@/components/seo/SEO';
+
 export function ActivityLog() {
+    const mockMode = import.meta.env.VITE_MOCK_MODE === 'true';
+    const items = mockMode ? ACTIVITIES : [];
     return (
         <div className="space-y-8 p-8 min-h-screen bg-background text-foreground">
+            <SEO title="Activity Log" description="Track workspace actions." />
             <PageHeader title="Activity Log" subtitle="Track every action within your workspace." />
 
             <FadeIn>
@@ -25,7 +30,9 @@ export function ActivityLog() {
                         </button>
                     </div>
                     <div className="divide-y divide-white/5">
-                        {ACTIVITIES.map((activity) => (
+                        {items.length === 0 ? (
+                            <div className="p-6 text-sm text-muted-foreground">No activity to display.</div>
+                        ) : items.map((activity) => (
                             <div key={activity.id} className="p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.status === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
                                     }`}>

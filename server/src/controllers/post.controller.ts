@@ -1,79 +1,78 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { aiService } from '../services/ai.service';
+import { postService } from '../services/post.service';
+import { AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../utils/asyncHandler';
+import { subscriptionService } from '../services/subscription.service';
+import { userService } from '../services/user.service';
+import { prisma } from '../utils/prisma';
 
-const prisma = new PrismaClient();
+export const generatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+    }
 
-export const generatePost = async (req: Request, res: Response) => {
-  try {
-    const { keywords, tone, postType, platform } = req.body;
+    const { keywords, tone, postType, platform, includeMedia } = req.body;
+    await userService.syncUser(req.user);
 
-    if (!keywords || !tone || !postType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const { allowed, limit, plan } = await subscriptionService.checkLimit(req.user.uid, 'aiGenerations');
+    if (!allowed) {
+        res.status(403).json({
+            error: `Plan limit reached (${plan})`,
+            message: `You have reached the limit of ${limit} AI generations for your ${plan} plan.`
+        });
+        return;
     }
 
     const suggestions = await aiService.generatePost({
       keywords,
       tone,
       postType,
-      platform: platform || 'twitter'
+      platform: platform || 'twitter',
+      includeMedia,
+      generationMode: req.body.generationMode || 'mix'
+    });
+
+    await prisma.aiGeneration.create({
+        data: {
+            userId: req.user.uid
+        }
     });
 
     res.json({ suggestions });
-  } catch (error) {
-    console.error('Generation error:', error);
-    res.status(500).json({ error: 'Failed to generate content' });
-  }
-};
+});
 
-export const createPost = async (req: Request, res: Response) => {
-  try {
-    const { content, mediaUrl, platform, scheduledAt } = req.body;
-    const userPayload = (req as any).user; // Attached by auth middleware
-
-    // Sync user to local DB
-    let user = await prisma.user.findUnique({
-      where: { email: userPayload.email }
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userPayload.uid, // Use Firebase UID as primary key if possible, or keep UUID and map it. 
-          // Actually schema has UUID default. Let's keep UUID for internal and store firebaseId? 
-          // Schema not updated for firebaseId. Let's used email as unique identifier for now and create.
-          email: userPayload.email,
-          password: 'firebase_oauth_user', // Placeholder
-          name: userPayload.name || userPayload.email.split('@')[0]
-        }
-      });
+export const createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
     }
 
-    const post = await prisma.post.create({
-      data: {
-        content,
-        mediaUrl,
-        platform: platform || 'twitter',
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-        status: scheduledAt ? 'SCHEDULED' : 'DRAFT',
-        userId: user.id
-      }
-    });
+    try {
+        const post = await postService.createPost(req.user, req.body);
+        res.json(post);
+    } catch (error: any) {
+        // Handle service-level errors (like limits)
+        if (error.message.includes('Plan limit')) {
+            res.status(403).json({ error: error.message });
+            return;
+        }
+        throw error;
+    }
+});
 
-    res.json(post);
-  } catch (error) {
-    console.error('Create post error:', error);
-    res.status(500).json({ error: 'Failed to create post' });
-  }
-};
+export const getPosts = asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+    }
 
-export const getPosts = async (req: Request, res: Response) => {
-  try {
-    const posts = await prisma.post.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
+    const limit = limitParam ? Math.min(parseInt(String(limitParam), 10) || 50, 200) : 50;
+    const status = statusParam ? String(statusParam).toUpperCase() : undefined;
+
+    const posts = await postService.getPosts(req.user.uid, limit, status);
     res.json(posts);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch posts' });
-  }
-}
+});

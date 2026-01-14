@@ -2,6 +2,7 @@
 import cron from 'node-cron';
 import { prisma } from '../utils/prisma';
 import { automationService } from './automation.service';
+import { logger } from '../utils/logger';
 
 
 export class SchedulerService {
@@ -33,18 +34,18 @@ export class SchedulerService {
             });
 
             if (duePosts.length > 0) {
-                console.log(`[Scheduler] Found ${duePosts.length} due posts.`);
+                logger.info({ count: duePosts.length }, 'Scheduler found due posts');
                 
                 // Process in parallel but with error isolation
                 await Promise.allSettled(duePosts.map(post => this.publishPost(post)));
             }
         } catch (error) {
-            console.error('[Scheduler] Critical error checking posts:', error);
+            logger.error({ err: error }, 'Scheduler failed to check posts');
         }
     }
 
     async publishPost(post: { id: string, platform: string }) {
-        console.log(`[Scheduler] Publishing post ${post.id} to ${post.platform}...`);
+        logger.info({ postId: post.id, platform: post.platform }, 'Publishing scheduled post');
 
         try {
             // Mock Publishing Logic (Integration with social APIs would go here)
@@ -55,9 +56,9 @@ export class SchedulerService {
                 data: { status: 'PUBLISHED' }
             });
 
-            console.log(`[Scheduler] Post ${post.id} published successfully.`);
+            logger.info({ postId: post.id }, 'Scheduled post published');
         } catch (error) {
-            console.error(`[Scheduler] Failed to publish post ${post.id}:`, error);
+            logger.error({ err: error, postId: post.id }, 'Failed to publish scheduled post');
             // Optional: Update status to 'FAILED'
              await prisma.post.update({
                 where: { id: post.id },

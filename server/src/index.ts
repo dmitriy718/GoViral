@@ -3,7 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
-import { prisma } from './utils/prisma';
+import { logger } from './utils/logger';
+import { requestId } from './middleware/requestId';
 import postRoutes from './routes/post.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import projectRoutes from './routes/project.routes';
@@ -15,12 +16,11 @@ import socialRoutes from './routes/social.routes';
 import articleRoutes from './routes/article.routes';
 import userRoutes from './routes/user.routes';
 import notionRoutes from './routes/notion.routes';
-import './services/scheduler.service'; // Start scheduler
-
 const app = express();
 const PORT = env.PORT;
 
 app.use(express.json({ limit: '1mb' }));
+app.use(requestId);
 const allowedOrigins = (env.CORS_ORIGIN || env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim())
@@ -38,7 +38,8 @@ app.use(cors({
   }
 }));
 app.use(helmet());
-app.use(morgan('dev'));
+morgan.token('id', (req: any) => req.id || '-');
+app.use(morgan(':id :method :url :status :res[content-length] - :response-time ms'));
 
 app.use('/api/posts', postRoutes);
 app.use('/api/workspaces', workspaceRoutes);
@@ -54,7 +55,7 @@ app.use('/api/notion', notionRoutes);
 
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('UNHANDLED SERVER ERROR:', err);
+  logger.error({ err, requestId: (req as any).id }, 'Unhandled server error');
   res.status(500).json({
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong on our end.'
@@ -67,5 +68,5 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info({ port: PORT }, 'Server running');
 });

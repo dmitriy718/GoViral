@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 
 
 export const getAllArticles = async (req: Request, res: Response) => {
@@ -17,7 +18,7 @@ export const getAllArticles = async (req: Request, res: Response) => {
         });
         res.json(articles);
     } catch (error) {
-        console.error('Error fetching articles:', error);
+        logger.error({ err: error }, 'Error fetching articles');
         res.status(500).json({ error: 'Failed to fetch articles' });
     }
 };
@@ -35,7 +36,7 @@ export const getArticleById = async (req: Request, res: Response) => {
 
         res.json(article);
     } catch (error) {
-        console.error('Error fetching article:', error);
+        logger.error({ err: error }, 'Error fetching article');
         res.status(500).json({ error: 'Failed to fetch article' });
     }
 };

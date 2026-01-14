@@ -2,10 +2,10 @@
 import { Request, Response } from 'express';
 import { analyticsService } from '../services/analytics.service';
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 
 
 export const getDashboardStats = async (req: Request, res: Response) => {
-    console.log('HIT ANALYTICS CONTROLLER');
     try {
         const userPayload = (req as any).user;
         const user = await prisma.user.findUnique({ where: { email: userPayload.email } });
@@ -17,7 +17,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         const stats = await analyticsService.getDashboardStats(user.id);
         res.json(stats);
     } catch (error) {
-        console.error('Analytics error:', error);
+        logger.error({ err: error }, 'Analytics error');
         res.status(500).json({ error: 'Failed to fetch analytics' });
     }
 };
@@ -33,7 +33,7 @@ export const getDetailedReport = async (req: Request, res: Response) => {
         const report = await analyticsService.getDetailedReport(user.id, range as string);
         res.json(report);
     } catch (error) {
-        console.error('Detailed report error:', error);
+        logger.error({ err: error }, 'Detailed report error');
         res.status(500).json({ error: 'Failed to fetch detailed report' });
     }
 };

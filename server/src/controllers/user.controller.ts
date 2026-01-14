@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { prisma } from '../utils/prisma';
+import { logger } from '../utils/logger';
 import { AuthRequest } from '../middleware/auth';
 
 
@@ -28,7 +29,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
 
         res.json(user);
     } catch (error) {
-        console.error('Get Profile Error:', error);
+        logger.error({ err: error }, 'Get profile error');
         res.status(500).json({ error: 'Failed to fetch profile' });
     }
 };
@@ -53,7 +54,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
         res.json(user);
     } catch (error) {
-        console.error('Update Profile Error:', error);
+        logger.error({ err: error }, 'Update profile error');
         res.status(500).json({ error: 'Failed to update profile' });
     }
 };

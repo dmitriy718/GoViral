@@ -1,14 +1,18 @@
 import { FadeIn, GlassCard, PageHeader } from "@/components/ui/design-system";
-import { MessageSquare, Search, Book, ExternalLink } from "lucide-react";
+import { MessageSquare, Search, Book, ExternalLink, Ticket } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { SEO } from '@/components/seo/SEO';
 
 export function Support() {
     const [ticketSubject, setTicketSubject] = useState("");
     const [ticketMessage, setTicketMessage] = useState("");
+    const mockMode = import.meta.env.VITE_MOCK_MODE === 'true';
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!mockMode) return;
         if (!ticketSubject || !ticketMessage) return;
 
         // Simulate API call
@@ -19,8 +23,11 @@ export function Support() {
         }, 1000);
     };
 
+
+
     return (
         <div className="p-8 max-w-7xl mx-auto">
+            <SEO title="Help Desk" description="Get support for PostDoctor." />
             <PageHeader title="Help Desk" subtitle="We're here to help you go viral." />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -32,6 +39,11 @@ export function Support() {
                                 <MessageSquare className="w-5 h-5 text-primary" />
                                 Submit a Request
                             </h2>
+                            {!mockMode && (
+                                <div className="text-sm text-yellow-300 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                                    Support ticketing is not enabled in production yet.
+                                </div>
+                            )}
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-2 text-muted-foreground">Subject</label>
@@ -53,7 +65,7 @@ export function Support() {
                                 </div>
                                 <button
                                     onClick={handleSubmit}
-                                    disabled={!ticketSubject || !ticketMessage}
+                                    disabled={!mockMode || !ticketSubject || !ticketMessage}
                                     className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Submit Ticket
@@ -65,17 +77,11 @@ export function Support() {
                     <FadeIn delay={0.1}>
                         <h3 className="text-lg font-medium mb-4 ml-1">Your Recent Tickets</h3>
                         <div className="space-y-4">
-                            {[1, 2].map((i) => (
-                                <GlassCard key={i} className="flex justify-between items-center py-4" hoverEffect>
-                                    <div>
-                                        <h4 className="font-medium">Question about billing cycle</h4>
-                                        <p className="text-sm text-muted-foreground">Ticket #{1023 + i} • Last updated 2 hours ago</p>
-                                    </div>
-                                    <span className="px-3 py-1 bg-yellow-500/10 text-yellow-500 text-xs rounded-full border border-yellow-500/20">
-                                        Pending
-                                    </span>
-                                </GlassCard>
-                            ))}
+                            {/* Real ticket logic would map here. Showing empty state for now as per requirement. */}
+                            <div className="flex flex-col items-center justify-center p-8 bg-white/5 border border-dashed border-white/10 rounded-lg text-center">
+                                <Ticket className="w-8 h-8 text-muted-foreground mb-2" />
+                                <p className="text-sm text-gray-400">No open tickets found.</p>
+                            </div>
                         </div>
                     </FadeIn>
                 </div>
@@ -97,17 +103,17 @@ export function Support() {
                                 Popular Articles
                             </h3>
                             {[
-                                "How to connect LinkedIn Page",
-                                "Best times to post for engagement",
-                                "Understanding the Viral Score",
-                                "Managing team permissions"
+                                { title: "How to connect LinkedIn Page", to: "/learn/8" },
+                                { title: "Best times to post for engagement", to: "/learn/9" },
+                                { title: "Understanding the Viral Score", to: "/learn/10" },
+                                { title: "Managing team permissions", to: "/learn/7" }
                             ].map((article, i) => (
-                                <a key={i} href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors flex items-center justify-between group">
-                                    {article}
+                                <Link key={i} to={article.to} className="block text-sm text-muted-foreground hover:text-primary transition-colors flex items-center justify-between group">
+                                    {article.title}
                                     <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                </a>
+                                </Link>
                             ))}
-                            <button className="text-xs text-primary mt-4 font-medium hover:underline">View all 142 articles →</button>
+                            <Link to="/learn" className="block text-xs text-primary mt-4 font-medium hover:underline">View all articles →</Link>
                         </GlassCard>
                     </FadeIn>
                 </div>

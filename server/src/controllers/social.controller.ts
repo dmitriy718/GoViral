@@ -4,6 +4,7 @@ import axios from 'axios';
 import { subscriptionService } from '../services/subscription.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthRequest } from '../middleware/auth';
+import { encrypt } from '../utils/crypto';
 
 const appUrl = process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173';
 const normalizedAppUrl = appUrl.replace(/\/$/, '');
@@ -54,7 +55,7 @@ export const connectProvider = asyncHandler(async (req: AuthRequest, res: Respon
             userId: user.id,
             provider,
             platformUserId: `mock-${provider}-${Date.now()}`,
-            accessToken: 'mock-access-token',
+            accessToken: encrypt('mock-access-token'),
             username: `@${user.name?.replace(/\s+/g, '') || 'user'}_${provider}`
         }
     });
@@ -72,7 +73,8 @@ export const getConnectedProviders = asyncHandler(async (req: AuthRequest, res: 
         where: { userId: req.user.uid }
     });
 
-    res.json(accounts);
+    const sanitized = accounts.map(({ accessToken, refreshToken, ...rest }) => rest);
+    res.json(sanitized);
 });
 
 // ... (Keep existing OAuth flows as they are complex and might need specific error handling, 
@@ -199,7 +201,7 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
                 }
             },
             update: {
-                accessToken: pageAccessToken,
+                accessToken: encrypt(pageAccessToken),
                 username: pageName,
                 updatedAt: new Date()
             },
@@ -207,9 +209,9 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
                 userId: user.id,
                 provider: 'facebook',
                 platformUserId: pageId,
-                accessToken: pageAccessToken,
+                accessToken: encrypt(pageAccessToken),
                 username: pageName,
-                refreshToken: userAccessToken // Storing user token as refresh token backup
+                refreshToken: encrypt(userAccessToken) // Store encrypted
             }
         });
 

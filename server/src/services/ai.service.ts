@@ -1,99 +1,153 @@
+import { openai } from '../utils/openai';
+import { personaService } from './persona.service';
+import { logger } from '../utils/logger';
+
 interface GeneratePostParams {
-  keywords: string[];
-  tone: string;
-  postType: 'text' | 'image' | 'video' | 'poll' | 'link';
-  platform: string;
+    keywords: string[];
+    tone: string;
+    postType: 'text' | 'image' | 'video' | 'poll' | 'link';
+    platform: string;
+    includeMedia?: boolean;
+    generationMode?: 'text' | 'image' | 'mix' | 'repurpose';
+    sourceContent?: string;
 }
 
-interface GeneratedContent {
-  content: string;
-  hashtags: string[];
-  mediaUrl?: string;
-  platform: string;
+interface AIResponseItem {
+    content: string;
+    hashtags?: string[];
+    imagePrompt?: string; 
+    pollOptions?: string[];
+}
+
+interface FinalPost {
+    content: string;
+    hashtags: string[];
+    mediaUrl?: string;
+    platform: string;
 }
 
 export class AIService {
-  async generatePost(params: GeneratePostParams): Promise<GeneratedContent[]> {
-    // In a real app, this would call OpenAI/Anthropic
-    // For this prototype, we simulate high-quality generation
     
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate AI latency
+    async generatePost(params: GeneratePostParams): Promise<FinalPost[]> {
+        if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('PLACEHOLDER')) {
+            return this.generateMock(params);
+        }
 
-    const baseContent = `Here is a ${params.tone} post about ${params.keywords.join(', ')}.`;
-    const cleanKeywords = params.keywords.map(k => k.trim().replace(/\s+/g, ''));
-    let hashtags: string[] = [];
-    let variations: GeneratedContent[] = [];
+        try {
+            // 1. Generate Text Content
+            const textResults = await this.generateTextContent(params);
+            const finalPosts: FinalPost[] = [];
 
-    if (params.platform === 'twitter') {
-        hashtags = ['#goviral', ...cleanKeywords.slice(0, 2).map(k => `#${k}`)];
-        variations = [
-            {
-                content: `🚀 ${baseContent} #tech`,
-                hashtags,
-                platform: 'twitter',
-            },
-            {
-                content: `Thinking about ${params.keywords[0]}? Here's my take: ${baseContent}`,
-                hashtags,
-                platform: 'twitter',
-            },
-            {
-                content: `🧵 Thread: Why ${params.keywords[0]} matters. \n\n1/ ${baseContent}`,
-                hashtags,
-                platform: 'twitter',
+            // 2. Process each variation
+            for (const item of textResults) {
+                let mediaUrl: string | undefined = undefined;
+
+                // Generate image if requested (Sequential to avoid rate limits)
+                if (params.includeMedia && item.imagePrompt) {
+                    if (finalPosts.length > 0) await new Promise(r => setTimeout(r, 1000));
+                    mediaUrl = await this.generateImage(item.imagePrompt);
+                }
+
+                finalPosts.push({
+                    content: this.formatContent(item, params.postType),
+                    hashtags: item.hashtags || [],
+                    platform: params.platform,
+                    mediaUrl: mediaUrl
+                });
             }
-        ];
-    } else if (params.platform === 'linkedin') {
-        hashtags = ['#Professional', '#Innovation', ...cleanKeywords.map(k => `#${k}`)];
-        variations = [
-            {
-                content: `Excited to share some thoughts on ${params.keywords.join(' and ')}.\n\n${baseContent}\n\nWhat are your experiences with this? Let's connect in the comments! 👇`,
-                hashtags,
-                platform: 'linkedin',
-            },
-            {
-                content: `💡 Insight of the day: ${baseContent}\n\nAs we navigate the changing landscape of ${params.keywords[0]}, it's crucial to stay ahead.\n\n#Leadership #Growth`,
-                hashtags,
-                platform: 'linkedin',
-            },
-            {
-                content: `I've been reflecting on ${params.keywords[0]} lately.\n\n${baseContent}\n\nAgree or disagree?`,
-                hashtags,
-                platform: 'linkedin',
-            }
-        ];
-    } else {
-        // Facebook/Default
-        hashtags = cleanKeywords.map(k => `#${k}`);
-        variations = [
-            {
-                content: `${baseContent} \n\nTag a friend who needs to see this!`,
-                hashtags,
-                platform: params.platform,
-            },
-            {
-                content: `Check this out! ${baseContent}`,
-                hashtags,
-                platform: params.platform,
-            },
-            {
-                content: `Question for you all: ${baseContent}`,
-                hashtags,
-                platform: params.platform,
-            }
-        ];
+
+            return finalPosts;
+
+        } catch (error: any) {
+            logger.error({ err: error }, 'AI generation failed');
+            return this.generateMock(params);
+        }
     }
 
-    // Add media if needed
-    if (params.postType === 'image') {
-        variations = variations.map((v, i) => ({
-            ...v,
-            mediaUrl: `https://via.placeholder.com/800x400?text=${encodeURIComponent(params.keywords[0])}+${i+1}`
-        }));
+    private async generateTextContent(params: GeneratePostParams): Promise<AIResponseItem[]> {
+        const systemPrompt = `
+        You are an expert Social Media Strategist.
+        Generate a JSON object with a "posts" array containing 3 DISTINCT variations.
+        Each variation MUST take a different angle or perspective on the topic.
+        Tone: ${params.tone}
+        Platform: ${params.platform}
+        `;
+        
+        let userPrompt = '';
+        const mediaInstruction = (params.includeMedia || params.postType === 'image') 
+            ? 'For EACH post, include a detailed "imagePrompt" field for DALL-E 3.' 
+            : '';
+
+        if (params.generationMode === 'repurpose' && params.sourceContent) {
+            userPrompt = `Repurpose this: "${params.sourceContent}". 
+            Variation 1: Educational Insight. 
+            Variation 2: Contrarian/Surprising Perspective. 
+            Variation 3: Question/Poll-style. 
+            ${mediaInstruction}`;
+        } else {
+            userPrompt = `Topic: ${params.keywords.join(', ')}. 
+            Type: ${params.postType}. 
+            Make each of the 3 variations completely unique in hook and structure.
+            ${mediaInstruction}`;
+        }
+
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
+            model: "gpt-4o-mini",
+            response_format: { type: "json_object" },
+            temperature: 0.9, // Higher temperature for more variety
+        });
+
+        const raw = completion.choices[0].message.content || '{}';
+        try {
+            const parsed = JSON.parse(raw);
+            const items = parsed.posts || parsed.variations || [parsed];
+            
+            return items.map((item: any) => ({
+                content: item.content || item.text || item.caption || "Content unavailable",
+                hashtags: item.hashtags || [],
+                imagePrompt: item.imagePrompt || item.image_prompt,
+                pollOptions: item.pollOptions
+            }));
+        } catch (e) {
+            throw new Error('Failed to parse AI response');
+        }
     }
 
-    return variations;
-  }
+    private async generateImage(prompt: string): Promise<string> {
+        logger.info('Generating DALL-E 3 image');
+        try {
+            const response = await openai.images.generate({
+                model: "dall-e-3",
+                prompt: prompt + ", high quality, professional photography or 3d render, no text",
+                n: 1,
+                size: "1024x1024",
+                quality: "standard",
+            });
+            return response.data?.[0]?.url || "";
+        } catch (error: any) {
+            logger.error({ err: error }, 'Image generation failed');
+            // Graceful fallback to Unsplash if even DALL-E 3 fails (e.g. safety filter)
+            return "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop";
+        }
+    }
+
+    private formatContent(item: AIResponseItem, type: string): string {
+        let text = item.content;
+        if (type === 'poll' && item.pollOptions) {
+            text += '\n\n' + item.pollOptions.map((o, i) => `${i+1}. ${o}`).join('\n');
+        }
+        return text;
+    }
+
+    private async generateMock(params: GeneratePostParams): Promise<FinalPost[]> {
+        return [{
+            content: `[MOCK] Post about ${params.keywords.join(', ')}.`,
+            hashtags: ['#mock'],
+            platform: params.platform,
+            mediaUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+        }];
+    }
 }
 
 export const aiService = new AIService();
