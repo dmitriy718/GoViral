@@ -9,7 +9,9 @@ export const withRetries = async <T>(fn: () => Promise<T>, retries = 2, delayMs 
             if (attempt > retries) {
                 throw error;
             }
-            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            const backoff = delayMs * Math.pow(2, attempt - 1);
+            const jitter = Math.floor(Math.random() * 100);
+            await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
         }
     }
 };

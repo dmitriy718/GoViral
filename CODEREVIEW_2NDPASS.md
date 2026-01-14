@@ -55,7 +55,7 @@ Status:
 Recommendation:
 - Add retry backoff and per‑service failure thresholds.
 Status:
-- Added basic retry helper; next step is exponential backoff + circuit breaker.
+- Added retry helper with exponential backoff + jitter; circuit breaker still recommended.
 
 3) **Frontend build artifacts served by custom node server**
 - Static server is functional, but lacks caching headers and compression.
