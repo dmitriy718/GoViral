@@ -12,7 +12,13 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase only if config is present to prevent crashes during dev without keys
+const hasConfig = Object.values(firebaseConfig).every((value) => Boolean(value));
+
+if (!hasConfig) {
+  console.error('Firebase config is missing. Check VITE_FIREBASE_* environment variables.');
+  throw new Error('Firebase configuration missing');
+}
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const analytics = getAnalytics(app);
