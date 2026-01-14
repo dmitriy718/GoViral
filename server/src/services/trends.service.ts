@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { logger } from '../utils/logger';
+import { withRetries } from '../utils/retry';
 
 interface Trend {
     topic: string;
@@ -19,10 +20,10 @@ export class TrendsService {
         }
 
         try {
-            const response = await axios.get(
+            const response = await withRetries(() => axios.get(
                 `https://newsapi.org/v2/top-headlines?category=technology&language=en&apiKey=${this.apiKey}`,
                 { timeout: 8000 }
-            );
+            ));
             const articles = response.data.articles.slice(0, 5);
 
             return articles.map((article: any, index: number) => ({

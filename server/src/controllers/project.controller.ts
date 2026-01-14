@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
+import { userService } from '../services/user.service';
 
 
 export const createProject = async (req: Request, res: Response) => {
@@ -9,8 +10,11 @@ export const createProject = async (req: Request, res: Response) => {
         const userPayload = (req as any).user;
 
         // Get user
-        const user = await prisma.user.findUnique({
-            where: { email: userPayload.email }
+        const user = await userService.syncUser({
+            uid: userPayload.uid,
+            email: userPayload.email,
+            name: userPayload.name,
+            picture: userPayload.picture
         });
 
         if (!user) {
@@ -36,8 +40,12 @@ export const createProject = async (req: Request, res: Response) => {
 export const getProjects = async (req: Request, res: Response) => {
     try {
         const userPayload = (req as any).user;
-        const user = await prisma.user.findUnique({ where: { email: userPayload.email } });
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        const user = await userService.syncUser({
+            uid: userPayload.uid,
+            email: userPayload.email,
+            name: userPayload.name,
+            picture: userPayload.picture
+        });
 
         const projects = await prisma.project.findMany({
             where: { userId: user.id },

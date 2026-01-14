@@ -6,6 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { AuthRequest } from '../middleware/auth';
 import { encrypt } from '../utils/crypto';
 import { logger } from '../utils/logger';
+import { withRetries } from '../utils/retry';
 
 const appUrl = process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173';
 const normalizedAppUrl = appUrl.replace(/\/$/, '');
@@ -142,10 +143,10 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
         });
 
         // console.log('Exchanging code for token...');
-        const tokenRes = await axios.get(
+        const tokenRes = await withRetries(() => axios.get(
             `https://graph.facebook.com/v18.0/oauth/access_token?${tokenParams.toString()}`,
             { timeout: 8000 }
-        );
+        ));
         const userAccessToken = tokenRes.data.access_token;
 
         if (!userAccessToken) {
@@ -155,10 +156,10 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
         // 2. Get User's Pages
         // We need the Pages to get the PAGE ACCESS TOKEN (Post permission)
         // console.log('Fetching pages...');
-        const pagesRes = await axios.get(
+        const pagesRes = await withRetries(() => axios.get(
             `https://graph.facebook.com/v18.0/me/accounts?access_token=${userAccessToken}`,
             { timeout: 8000 }
-        );
+        ));
         const pages = pagesRes.data.data;
 
         if (!pages || pages.length === 0) {
