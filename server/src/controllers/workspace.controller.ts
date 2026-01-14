@@ -34,9 +34,12 @@ export const createWorkspace = async (req: Request, res: Response) => {
             where: { ownerId: user.id }
         });
 
-        console.log(`[CreateWorkspace] User: ${user.email}, Plan: ${plan} (Raw: ${rawPlan}), Limit: ${limit}, Owned: ${ownedCount}`);
+        // Admin Bypass Logic
+        const isAdmin = user.email === 'admin@postdoctor.app';
 
-        if (ownedCount >= limit) {
+        console.log(`[CreateWorkspace] User: ${user.email}, Plan: ${plan}, Limit: ${limit}, Owned: ${ownedCount}, Admin: ${isAdmin}`);
+
+        if (!isAdmin && ownedCount >= limit) {
             console.log('[CreateWorkspace] Limit reached.');
             return res.status(403).json({
                 error: `Plan limit reached. You can only create ${limit} workspace(s) on the ${plan} plan.`
@@ -73,12 +76,26 @@ export const getWorkspaces = async (req: Request, res: Response) => {
         const userPayload = (req as any).user;
 
         // Find user by email to get their ID
-        const user = await prisma.user.findUnique({
+        // Sync user from token payload if they don't exist in DB
+        let user = await prisma.user.findUnique({
             where: { email: userPayload.email },
             select: { id: true }
         });
 
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (!user) {
+            console.log(`[GetWorkspaces] User ${userPayload.email} not found in DB. Auto-creating...`);
+            user = await prisma.user.create({
+                data: {
+                    id: userPayload.uid, // Explicitly use Firebase UID
+                    email: userPayload.email,
+                    name: userPayload.name || 'New User',
+                    subscription: {
+                        create: { plan: 'FREE' }
+                    }
+                },
+                select: { id: true }
+            });
+        }
 
         let workspaces = await prisma.workspace.findMany({
             where: {
