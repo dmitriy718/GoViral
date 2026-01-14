@@ -46,22 +46,35 @@ export const createWorkspace = async (req: Request, res: Response) => {
             });
         }
 
-        // Create Workspace
-        const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substring(7);
-
-        const workspace = await prisma.workspace.create({
-            data: {
-                name,
-                slug,
-                ownerId: user.id,
-                members: {
-                    create: {
-                        userId: user.id,
-                        role: 'OWNER'
+        const baseSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        let workspace;
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+            const slug = `${baseSlug}-${Math.random().toString(36).substring(7)}`;
+            try {
+                workspace = await prisma.workspace.create({
+                    data: {
+                        name,
+                        slug,
+                        ownerId: user.id,
+                        members: {
+                            create: {
+                                userId: user.id,
+                                role: 'OWNER'
+                            }
+                        }
                     }
+                });
+                break;
+            } catch (error: any) {
+                if (error?.code !== 'P2002') {
+                    throw error;
                 }
             }
-        });
+        }
+
+        if (!workspace) {
+            return res.status(500).json({ error: 'Failed to create workspace. Please try again.' });
+        }
 
         res.json(workspace);
 
