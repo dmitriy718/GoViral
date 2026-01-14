@@ -23,7 +23,12 @@ export const reportError = async (req: Request, res: Response) => {
         };
 
         // 1. Log to Console (Immediate Visibility)
-        console.error('CRITICAL CLIENT ERROR REPORTED:', JSON.stringify(report, null, 2));
+        console.error('CRITICAL CLIENT ERROR REPORTED:', {
+            timestamp,
+            message: errorData?.message,
+            url: errorData?.url,
+            ip: req.ip
+        });
 
         // 2. Save to Disk (Simulating Email/Persistence)
         fs.writeFileSync(logFile, JSON.stringify(report, null, 2));
