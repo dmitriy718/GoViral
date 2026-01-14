@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 
 async function main() {
-    const user = await prisma.user.findUnique({ where: { email: 'admin@goviral.ai' } });
+    const user = await prisma.user.findUnique({ where: { email: 'admin@postdoctor.app' } });
     if (!user) return;
 
     const workspaces = await prisma.workspace.findMany({

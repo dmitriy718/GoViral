@@ -1,7 +1,7 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { AuthenticatedUser } from '../middleware/auth';
+import { prisma } from '../utils/prisma';
 
-const prisma = new PrismaClient();
 
 export class UserService {
     async syncUser(userPayload: AuthenticatedUser): Promise<User> {

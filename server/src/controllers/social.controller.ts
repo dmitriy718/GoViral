@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prisma';
 import axios from 'axios';
 import { subscriptionService } from '../services/subscription.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthRequest } from '../middleware/auth';
 
-const prisma = new PrismaClient();
 const appUrl = process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173';
 const normalizedAppUrl = appUrl.replace(/\/$/, '');
 const API_URL = process.env.APP_URL

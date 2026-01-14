@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './utils/prisma';
 import postRoutes from './routes/post.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import projectRoutes from './routes/project.routes';
@@ -18,7 +18,6 @@ import notionRoutes from './routes/notion.routes';
 import './services/scheduler.service'; // Start scheduler
 
 const app = express();
-const prisma = new PrismaClient();
 const PORT = env.PORT;
 
 app.use(express.json({ limit: '1mb' }));
