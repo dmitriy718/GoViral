@@ -24,6 +24,7 @@ model User {
   subscription Subscription?
   competitors Competitor[]
   integrations Integration[]
+  aiGenerations AiGeneration[]
 
   workspaceMemberships WorkspaceMember[]
 
