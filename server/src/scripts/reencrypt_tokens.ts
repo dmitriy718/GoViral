@@ -1,8 +1,7 @@
 import { prisma } from '../utils/prisma';
 import { decrypt, encrypt } from '../utils/crypto';
 
-const reencryptValue = (value: string | null) => {
-    if (!value) return value;
+const reencryptValue = (value: string) => {
     const plaintext = decrypt(value);
     return encrypt(plaintext);
 };
