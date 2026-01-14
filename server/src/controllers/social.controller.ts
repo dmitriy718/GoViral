@@ -5,6 +5,7 @@ import { subscriptionService } from '../services/subscription.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthRequest } from '../middleware/auth';
 import { encrypt } from '../utils/crypto';
+import { logger } from '../utils/logger';
 
 const appUrl = process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173';
 const normalizedAppUrl = appUrl.replace(/\/$/, '');
@@ -110,7 +111,7 @@ export const initiateFacebookAuth = async (req: Request, res: Response) => {
 
         res.redirect(authUrl);
     } catch (error) {
-        console.error('FB Init Error:', error);
+        logger.error({ err: error }, 'Facebook auth init error');
         res.status(500).json({ error: 'Failed to initiate Facebook Auth' });
     }
 };
@@ -219,7 +220,7 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
         res.redirect(`${CLIENT_URL}/settings?success=facebook_connected`);
 
     } catch (error) {
-        console.error('FB Callback Error:', error);
+        logger.error({ err: error }, 'Facebook callback error');
         // In production, we should not show the raw error to the user
         res.redirect(`${CLIENT_URL}/settings?error=facebook_callback_failed`);
     }

@@ -1,11 +1,13 @@
 import admin from 'firebase-admin';
 import dotenv from 'dotenv';
 import path from 'path';
+import { logger } from '../utils/logger';
 
 dotenv.config();
 
 try {
     let credential;
+    const isProduction = process.env.NODE_ENV === 'production';
 
     // 1. Try environment variable containing JSON string
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
@@ -16,7 +18,7 @@ try {
         try {
             credential = admin.credential.cert(path.join(__dirname, 'serviceAccountKey.json'));
         } catch (e) {
-            console.warn("Firebase Service Account file not found in config/serviceAccountKey.json");
+            logger.warn("Firebase Service Account file not found in config/serviceAccountKey.json");
         }
     }
 
@@ -24,13 +26,41 @@ try {
         admin.initializeApp({
             credential,
         });
-        console.log('Firebase Admin initialized successfully');
+        logger.info('Firebase Admin initialized successfully');
     } else {
-        console.warn('Firebase Admin NOT initialized. Missing credentials.');
+        logger.warn('Firebase Admin NOT initialized. Missing credentials.');
+        if (isProduction) {
+            logger.error('Firebase Admin credentials are required in production. Exiting.');
+            process.exit(1);
+        }
     }
 
 } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+    logger.error({ err: error }, 'Firebase Admin initialization error');
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 }
 
-export const auth = admin.auth();
+const allowMockAuth = process.env.ALLOW_MOCK_AUTH === 'true' && process.env.NODE_ENV !== 'production';
+const notInitialized = async () => {
+    throw new Error('Firebase Admin is not initialized. Provide credentials or enable ALLOW_MOCK_AUTH in non-production.');
+};
+
+// Safe export that doesn't crash if app not initialized
+export const auth = (admin.apps.length > 0) ? admin.auth() : (allowMockAuth ? {
+    verifyIdToken: async (token: string) => {
+        if (token === 'mock-token') {
+            return { uid: '123e4567-e89b-12d3-a456-426614174000', email: 'mock@example.com', name: 'Mock User' };
+        }
+        throw new Error('Mock auth enabled but token did not match.');
+    },
+    getUserByEmail: notInitialized,
+    updateUser: notInitialized,
+    createUser: notInitialized
+} : {
+    verifyIdToken: notInitialized,
+    getUserByEmail: notInitialized,
+    updateUser: notInitialized,
+    createUser: notInitialized
+});
