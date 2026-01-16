@@ -2,10 +2,9 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { type ReactNode } from 'react';
-import { VerifyEmailNotice } from '@/pages/auth/VerifyEmailNotice';
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-    const { user, dbUser, loading } = useAuth();
+    const { user, loading } = useAuth();
     const location = useLocation();
 
     if (loading) {
