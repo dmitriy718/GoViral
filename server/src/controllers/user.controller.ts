@@ -103,6 +103,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
             }
         });
 
+        // Send confirmation email
+        try {
+            const name = user.name || user.email.split('@')[0];
+            await emailService.sendAccessGrantedEmail(user.email, name);
+        } catch (emailError) {
+            logger.error({ err: emailError }, 'Failed to send access granted email');
+        }
+
         res.json({ message: 'Email verified successfully' });
     } catch (error) {
         logger.error({ err: error }, 'Verify email error');

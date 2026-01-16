@@ -20,14 +20,5 @@ export function RequireAuth({ children }: { children: ReactNode }) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Block access if not verified
-    // Note: We check dbUser explicitly. If dbUser is missing (backend error), 
-    // we might want to let them through or block. 
-    // Blocking is safer, but if backend is down, it's annoying.
-    // Assuming if user is logged in, dbUser *should* be there eventually.
-    if (dbUser && !dbUser.emailVerified) {
-        return <VerifyEmailNotice />;
-    }
-
     return children;
 }

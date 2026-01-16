@@ -24,8 +24,10 @@ export class UserService {
             });
 
             try {
+                const name = newUser.name || newUser.email.split('@')[0];
+                await emailService.sendWelcomeEmail(newUser.email, name);
                 await emailService.sendVerificationEmail(newUser.email, verificationToken);
-                logger.info({ email: newUser.email }, 'Verification email sent to new user');
+                logger.info({ email: newUser.email }, 'Welcome and verification emails sent to new user');
             } catch (error) {
                 logger.error({ err: error }, 'Failed to send verification email during sync');
             }
