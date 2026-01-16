@@ -38,6 +38,12 @@ pids/
 coverage/
 .nyc_output/
 
+# Playwright
+playwright-report/
+test-results/
+client/playwright-report/
+client/test-results/
+
 # Docker
 docker-data/
 

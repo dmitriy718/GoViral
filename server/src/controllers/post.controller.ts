@@ -58,6 +58,10 @@ export const createPost = asyncHandler(async (req: AuthRequest, res: Response) =
             res.status(403).json({ error: error.message });
             return;
         }
+        if (error.message.includes('Project not found')) {
+            res.status(403).json({ error: error.message });
+            return;
+        }
         throw error;
     }
 });

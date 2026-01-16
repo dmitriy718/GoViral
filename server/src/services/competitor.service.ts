@@ -56,7 +56,7 @@ export class CompetitorService {
         const comps = await prisma.competitor.findMany({ where: { userId } });
         
         // Parse analysis JSON for frontend
-        return comps.map(c => ({
+        return comps.map((c: { analysis: string | null }) => ({
             ...c,
             analysis: c.analysis ? JSON.parse(c.analysis) : null
         }));

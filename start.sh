@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Starting GoViral..."
+echo "Starting PostDoctor..."
 
 # Function to cleanup background processes on exit
 cleanup() {
@@ -27,8 +27,11 @@ npm run dev > client.log 2>&1 &
 CLIENT_PID=$!
 cd ..
 
-echo "GoViral is running!"
-echo "Frontend: http://localhost:5173"
-echo "Backend: http://localhost:5000"
+APP_URL_VALUE="${APP_URL:-http://localhost:5173}"
+APP_URL_VALUE="${APP_URL_VALUE%/}"
+
+echo "PostDoctor is running!"
+echo "Frontend: ${APP_URL_VALUE}"
+echo "Backend: ${APP_URL_VALUE}/api"
 
 wait $SERVER_PID $CLIENT_PID

@@ -24,7 +24,7 @@ export function ErrorPage({ error, resetErrorBoundary }: ErrorPageProps) {
             });
             setReported(true);
             toast.success("Error report sent to development team.");
-        } catch (e) {
+        } catch {
             toast.error("Failed to send report. Please try again.");
         } finally {
             setIsReporting(false);

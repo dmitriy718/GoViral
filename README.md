@@ -20,9 +20,11 @@ Welcome to **PostDoctor**, your new command center for social media dominance.
 ## 🚀 Real Features Implemented
 - **AI Content Studio**: Generates posts using OpenAI (gpt-4o-mini) with tone customization (Professional, Meme Lord, etc.).
 - **Smart Scheduler**: Worker-backed scheduler publishes scheduled posts automatically.
-- **Analytics Deep Dive**: Detailed engagement reports and audience growth metrics.
-- **Competitor Spy**: Tracks competitor handles and ensures data persistence.
-- **Social Auth**: Mock OAuth flow for connecting Twitter, LinkedIn, etc.
+- **Analytics Overview**: Aggregated dashboard stats based on stored activity.
+- **Queue-backed Publishing**: BullMQ + Redis with retries, dedupe, and visibility timeouts.
+- **Observability**: Request IDs, latency percentiles, DB timing, and Sentry error capture.
+- **Product Analytics**: PostHog pageview capture when `VITE_POSTHOG_KEY` is set.
+- **Social Auth**: Mock OAuth flow for connecting Twitter, LinkedIn, etc. (for development only).
 - **Plan Limits**: Enforces post/account limits based on subscription tier (Free/Pro).
 
 ## Technology Stack
@@ -36,6 +38,9 @@ Welcome to **PostDoctor**, your new command center for social media dominance.
 - **Worker**: run `node dist/worker.js` (or systemd `postdoctor-worker`) for scheduler jobs.
 - **Deploy scripts**: see `ops/deploy-frontend.sh` and `ops/deploy-backend.sh`.
 - **Environment**: `server/.env` should include `ENCRYPTION_KEY` (32-byte base64) and `MOCK_MODE=false`.
+- **Mock-only features**: Competitor analysis, Notion sync, and detailed analytics are disabled unless `MOCK_MODE=true`.
+- **Sentry**: set `SENTRY_DSN` to enable server/client error capture.
+- **PostHog**: set `VITE_POSTHOG_KEY` and optionally `VITE_POSTHOG_HOST`.
 
 ## Note on Docker
 

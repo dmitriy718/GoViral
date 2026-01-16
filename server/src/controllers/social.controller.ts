@@ -7,6 +7,7 @@ import { AuthRequest } from '../middleware/auth';
 import { encrypt } from '../utils/crypto';
 import { logger } from '../utils/logger';
 import { withRetries } from '../utils/retry';
+import { withCircuit } from '../utils/circuitBreaker';
 
 const appUrl = process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173';
 const normalizedAppUrl = appUrl.replace(/\/$/, '');
@@ -75,7 +76,7 @@ export const getConnectedProviders = asyncHandler(async (req: AuthRequest, res: 
         where: { userId: req.user.uid }
     });
 
-    const sanitized = accounts.map(({ accessToken, refreshToken, ...rest }) => rest);
+    const sanitized = accounts.map(({ accessToken, refreshToken, ...rest }: { accessToken: string; refreshToken?: string | null }) => rest);
     res.json(sanitized);
 });
 
@@ -143,10 +144,10 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
         });
 
         // console.log('Exchanging code for token...');
-        const tokenRes = await withRetries(() => axios.get(
+        const tokenRes = await withCircuit('fb-oauth', () => withRetries(() => axios.get(
             `https://graph.facebook.com/v18.0/oauth/access_token?${tokenParams.toString()}`,
             { timeout: 8000 }
-        ));
+        )), { failureThreshold: 3, resetMs: 30000 });
         const userAccessToken = tokenRes.data.access_token;
 
         if (!userAccessToken) {
@@ -156,10 +157,10 @@ export const handleFacebookCallback = async (req: Request, res: Response) => {
         // 2. Get User's Pages
         // We need the Pages to get the PAGE ACCESS TOKEN (Post permission)
         // console.log('Fetching pages...');
-        const pagesRes = await withRetries(() => axios.get(
+        const pagesRes = await withCircuit('fb-pages', () => withRetries(() => axios.get(
             `https://graph.facebook.com/v18.0/me/accounts?access_token=${userAccessToken}`,
             { timeout: 8000 }
-        ));
+        )), { failureThreshold: 3, resetMs: 30000 });
         const pages = pagesRes.data.data;
 
         if (!pages || pages.length === 0) {

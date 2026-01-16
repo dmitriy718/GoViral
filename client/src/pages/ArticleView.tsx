@@ -43,6 +43,11 @@ export function ArticleView() {
         fetchArticle();
     }, [id]);
 
+    const sanitizedContent = useMemo(() => {
+        if (!article?.content) return '';
+        return DOMPurify.sanitize(article.content);
+    }, [article?.content]);
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
@@ -50,11 +55,6 @@ export function ArticleView() {
             </div>
         )
     }
-
-    const sanitizedContent = useMemo(() => {
-        if (!article?.content) return '';
-        return DOMPurify.sanitize(article.content);
-    }, [article?.content]);
 
     return (
         <div className="max-w-4xl mx-auto p-8">

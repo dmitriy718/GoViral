@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import { useAuth } from './AuthContext';
@@ -27,17 +27,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
 
-    useEffect(() => {
-        if (user) {
-            refreshWorkspaces();
-        } else {
-            setWorkspaces([]);
-            setCurrentWorkspace(null);
-            setIsLoading(false);
-        }
-    }, [user]);
-
-    const refreshWorkspaces = async () => {
+    const refreshWorkspaces = useCallback(async () => {
         try {
             setIsLoading(true);
             const res = await api.get('/workspaces');
@@ -45,7 +35,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
             // Set default if none selected
             if (res.data.length > 0 && !currentWorkspace) {
-                const stored = localStorage.getItem('goviral_workspace_id');
+                const stored = localStorage.getItem('postdoctor_workspace_id');
                 const found = res.data.find((w: Workspace) => w.id === stored);
                 setCurrentWorkspace(found || res.data[0]);
             }
@@ -54,17 +44,28 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentWorkspace]);
+
+    useEffect(() => {
+        if (user) {
+            refreshWorkspaces();
+        } else {
+            setWorkspaces([]);
+            setCurrentWorkspace(null);
+            setIsLoading(false);
+        }
+    }, [user, refreshWorkspaces]);
 
     const createWorkspace = async (name: string) => {
         try {
             const res = await api.post('/workspaces', { name });
             setWorkspaces(prev => [res.data, ...prev]);
             setCurrentWorkspace(res.data);
-            localStorage.setItem('goviral_workspace_id', res.data.id);
+            localStorage.setItem('postdoctor_workspace_id', res.data.id);
             toast.success("Workspace created successfully");
-        } catch (error: any) {
-            const msg = error.response?.data?.error || "Failed to create workspace";
+        } catch (error) {
+            const err = error as { response?: { data?: { error?: string } } };
+            const msg = err.response?.data?.error || "Failed to create workspace";
             toast.error(msg);
             throw error;
         }
@@ -74,7 +75,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         const found = workspaces.find(w => w.id === workspaceId);
         if (found) {
             setCurrentWorkspace(found);
-            localStorage.setItem('goviral_workspace_id', found.id);
+            localStorage.setItem('postdoctor_workspace_id', found.id);
             toast.success(`Switched to ${found.name}`);
             // In a real app we might reload or re-fetch data for the new workspace here
         }
@@ -87,6 +88,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWorkspace() {
     const context = useContext(WorkspaceContext);
     if (context === undefined) {

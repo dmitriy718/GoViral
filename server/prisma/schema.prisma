@@ -16,6 +16,9 @@ model User {
   jobTitle  String?
   avatarUrl String?
   
+  emailVerified Boolean @default(false)
+  verificationToken String? @unique
+
   accounts  SocialAccount[]
   posts     Post[]
   projects  Project[]

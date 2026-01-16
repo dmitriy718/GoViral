@@ -52,7 +52,7 @@ export const getProjects = async (req: Request, res: Response) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        const formatted = projects.map(p => ({
+        const formatted = projects.map((p: { platforms: string }) => ({
             ...p,
             platforms: JSON.parse(p.platforms)
         }));

@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { GlassCard, FadeIn } from "@/components/ui/design-system";
 import { useAuth } from '@/context/AuthContext';
-import { Loader2, Chrome } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+import { SEO } from '@/components/seo/SEO';
+
 export function Login() {
-    const navigate = useNavigate();
     const { user, signInWithGoogle, loginWithEmail, signupWithEmail, loading } = useAuth();
 
     const [isSignUp, setIsSignUp] = useState(false);
@@ -32,11 +33,12 @@ export function Login() {
             } else {
                 await loginWithEmail(email, password);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
+            const err = error as { code?: string, message?: string };
             // Firebase errors often look like "Firebase: Error (auth/invalid-credential)."
             // We strip the prefix to make it cleaner, or just show the message.
-            const msg = error.code ? error.code.replace('auth/', '').replace(/-/g, ' ') : error.message;
+            const msg = err.code ? err.code.replace('auth/', '').replace(/-/g, ' ') : err.message;
             toast.error(msg || "Authentication failed");
         } finally {
             setIsSubmitting(false);
@@ -45,6 +47,7 @@ export function Login() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
+            <SEO title="Login" description="Access your PostDoctor command center." />
             {/* Background Ambience */}
             <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px]" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px]" />
@@ -52,7 +55,7 @@ export function Login() {
             <FadeIn>
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">ViralPost AI</h1>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">PostDoctor</h1>
                         <p className="text-muted-foreground">{isSignUp ? 'Create your account' : 'Command Center Access'}</p>
                     </div>
                     <GlassCard className="p-8 space-y-6 backdrop-blur-xl">

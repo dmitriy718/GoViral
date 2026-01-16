@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import * as Sentry from '@sentry/node';
 import { logger } from '../utils/logger';
+import { env } from '../config/env';
 
 export const reportError = async (req: Request, res: Response) => {
     try {
@@ -19,6 +21,13 @@ export const reportError = async (req: Request, res: Response) => {
             url: errorData?.url,
             ip: req.ip
         }, 'Critical client error reported');
+
+        if (env.SENTRY_DSN) {
+            Sentry.captureMessage('Client error reported', {
+                level: 'error',
+                extra: report
+            });
+        }
 
         // Disk persistence removed for production safety.
 

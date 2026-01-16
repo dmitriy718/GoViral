@@ -1,4 +1,10 @@
-import { Post } from '@prisma/client';
+type Post = {
+    id: string;
+    autoPlugThreshold?: number | null;
+    autoPlugContent?: string | null;
+    autoDmKeyword?: string | null;
+    autoDmContent?: string | null;
+};
 import { prisma } from '../utils/prisma';
 import { env } from '../config/env';
 import { logger } from '../utils/logger';
@@ -46,9 +52,10 @@ export class AutomationService {
         // Mock API call to get engagement
         const currentLikes = Math.floor(Math.random() * 100); // Random simulation
         
-        logger.info({ postId: post.id, currentLikes, threshold: post.autoPlugThreshold }, 'AutoPlug check');
+        const threshold = typeof post.autoPlugThreshold === 'number' ? post.autoPlugThreshold : 0;
+        logger.info({ postId: post.id, currentLikes, threshold }, 'AutoPlug check');
 
-        if (currentLikes >= post.autoPlugThreshold) {
+        if (currentLikes >= threshold) {
             logger.info({ postId: post.id }, 'AutoPlug triggered');
             
             // In real app: await socialApi.reply(post.platformId, post.autoPlugContent);
@@ -69,7 +76,7 @@ export class AutomationService {
             { user: '@bot', text: 'Promote it here.' }
         ];
 
-        const keyword = post.autoDmKeyword?.toLowerCase();
+        const keyword = typeof post.autoDmKeyword === 'string' ? post.autoDmKeyword.toLowerCase() : '';
         if (!keyword) return;
 
         logger.info({ postId: post.id, keyword }, 'AutoDM scanning comments');

@@ -3,6 +3,7 @@ import cron from 'node-cron';
 import { prisma } from '../utils/prisma';
 import { automationService } from './automation.service';
 import { logger } from '../utils/logger';
+import { publishQueue } from '../utils/queue';
 
 
 export class SchedulerService {
@@ -43,37 +44,15 @@ export class SchedulerService {
 
             if (duePosts.length > 0) {
                 logger.info({ count: duePosts.length }, 'Scheduler found due posts');
-                
-                // Process in parallel but with error isolation
-                await Promise.allSettled(duePosts.map(post => this.publishPost(post)));
+
+                await Promise.allSettled(duePosts.map((post: { id: string }) =>
+                    publishQueue.add('publish-post', { postId: post.id }, { jobId: post.id })
+                ));
             }
         } catch (error) {
             logger.error({ err: error }, 'Scheduler failed to check posts');
         } finally {
             await prisma.$queryRaw`SELECT pg_advisory_unlock(${lockKey})`;
-        }
-    }
-
-    async publishPost(post: { id: string, platform: string }) {
-        logger.info({ postId: post.id, platform: post.platform }, 'Publishing scheduled post');
-
-        try {
-            // Mock Publishing Logic (Integration with social APIs would go here)
-            // await socialService.publish(post); 
-
-            await prisma.post.update({
-                where: { id: post.id },
-                data: { status: 'PUBLISHED' }
-            });
-
-            logger.info({ postId: post.id }, 'Scheduled post published');
-        } catch (error) {
-            logger.error({ err: error, postId: post.id }, 'Failed to publish scheduled post');
-            // Optional: Update status to 'FAILED'
-             await prisma.post.update({
-                where: { id: post.id },
-                data: { status: 'FAILED' }
-            });
         }
     }
 }

@@ -1,19 +1,40 @@
-import { User } from '@prisma/client';
 import { AuthenticatedUser } from '../middleware/auth';
 import { prisma } from '../utils/prisma';
-
+import { emailService } from './email.service';
+import crypto from 'crypto';
+import { logger } from '../utils/logger';
 
 export class UserService {
-    async syncUser(userPayload: AuthenticatedUser): Promise<User> {
-        return prisma.user.upsert({
+    async syncUser(userPayload: AuthenticatedUser) {
+        const existingUser = await prisma.user.findUnique({
+            where: { id: userPayload.uid }
+        });
+
+        if (!existingUser) {
+            const verificationToken = crypto.randomBytes(32).toString('hex');
+            const newUser = await prisma.user.create({
+                data: {
+                    id: userPayload.uid,
+                    email: userPayload.email,
+                    name: userPayload.name || userPayload.email.split('@')[0],
+                    avatarUrl: userPayload.picture,
+                    verificationToken,
+                    emailVerified: false
+                }
+            });
+
+            try {
+                await emailService.sendVerificationEmail(newUser.email, verificationToken);
+                logger.info({ email: newUser.email }, 'Verification email sent to new user');
+            } catch (error) {
+                logger.error({ err: error }, 'Failed to send verification email during sync');
+            }
+            return newUser;
+        }
+
+        return prisma.user.update({
             where: { id: userPayload.uid },
-            update: {
-                email: userPayload.email,
-                name: userPayload.name || userPayload.email.split('@')[0],
-                avatarUrl: userPayload.picture
-            },
-            create: {
-                id: userPayload.uid,
+            data: {
                 email: userPayload.email,
                 name: userPayload.name || userPayload.email.split('@')[0],
                 avatarUrl: userPayload.picture
@@ -21,7 +42,7 @@ export class UserService {
         });
     }
     
-    async getUser(id: string): Promise<User | null> {
+    async getUser(id: string) {
         return prisma.user.findUnique({ where: { id } });
     }
 }

@@ -40,6 +40,7 @@ Everything required to move GoViral to production‑ready status.
 - Add error tracking (Sentry) and metrics.
 - Redact PII and secrets from logs.
 - Provide a `/metrics` endpoint for basic request stats.
+- Add product analytics (PostHog) with pageview capture.
 
 ## Frontend Production Config
 - Use `VITE_API_BASE_URL` for API calls.
@@ -48,6 +49,7 @@ Everything required to move GoViral to production‑ready status.
 
 ## CI/CD & Release
 - Add CI steps: lint, typecheck, tests, migrations, security scans.
+- Add Playwright E2E smoke tests for critical user flows.
 - Add staging environment with production‑like config.
 - Use canary/blue‑green deployment and rollback strategy.
 

@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { analyticsService } from '../services/analytics.service';
 import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
+import { env } from '../config/env';
 
 
 export const getDashboardStats = async (req: Request, res: Response) => {
@@ -24,6 +25,9 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
 export const getDetailedReport = async (req: Request, res: Response) => {
     try {
+        if (env.MOCK_MODE !== 'true') {
+            return res.status(501).json({ error: 'Not implemented', message: 'Detailed analytics are not enabled in production yet.' });
+        }
         const userPayload = (req as any).user;
         const { range } = req.query;
 

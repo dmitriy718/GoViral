@@ -7,6 +7,9 @@ import { env } from '../config/env';
 
 export const connectNotion = asyncHandler(async (req: AuthRequest, res: Response) => {
     if (!req.user) return res.sendStatus(401);
+    if (env.MOCK_MODE !== 'true') {
+        return res.status(501).json({ error: 'Not implemented', message: 'Notion integration is not enabled in production yet.' });
+    }
     
     // Ensure user exists in DB before creating integration
     await userService.syncUser(req.user);

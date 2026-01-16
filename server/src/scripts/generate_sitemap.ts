@@ -24,7 +24,7 @@ async function generateSitemap() {
         select: { id: true, updatedAt: true }
     });
 
-    const dynamicRoutes = articles.map(article => ({
+    const dynamicRoutes = articles.map((article: { id: number; updatedAt: Date }) => ({
         url: `/learn/${article.id}`,
         lastmod: article.updatedAt.toISOString()
     }));
@@ -34,7 +34,7 @@ async function generateSitemap() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
     // Add Static
-    staticRoutes.forEach(route => {
+    staticRoutes.forEach((route: string) => {
         sitemap += `
     <url>
         <loc>${BASE_URL}${route}</loc>
@@ -44,7 +44,7 @@ async function generateSitemap() {
     });
 
     // Add Dynamic
-    dynamicRoutes.forEach(route => {
+    dynamicRoutes.forEach((route: { url: string; lastmod: string }) => {
         sitemap += `
     <url>
         <loc>${BASE_URL}${route.url}</loc>

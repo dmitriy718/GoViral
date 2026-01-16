@@ -1,9 +1,11 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { type ReactNode } from 'react';
+import { VerifyEmailNotice } from '@/pages/auth/VerifyEmailNotice';
 
-export function RequireAuth({ children }: { children: JSX.Element }) {
-    const { user, loading } = useAuth();
+export function RequireAuth({ children }: { children: ReactNode }) {
+    const { user, dbUser, loading } = useAuth();
     const location = useLocation();
 
     if (loading) {
@@ -15,10 +17,16 @@ export function RequireAuth({ children }: { children: JSX.Element }) {
     }
 
     if (!user) {
-        // Redirect them to the /login page, but save the current location they were
-        // trying to go to when they were redirected. This allows us to send them
-        // along to that page after they login, which is a nicer user experience.
         return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    // Block access if not verified
+    // Note: We check dbUser explicitly. If dbUser is missing (backend error), 
+    // we might want to let them through or block. 
+    // Blocking is safer, but if backend is down, it's annoying.
+    // Assuming if user is logged in, dbUser *should* be there eventually.
+    if (dbUser && !dbUser.emailVerified) {
+        return <VerifyEmailNotice />;
     }
 
     return children;

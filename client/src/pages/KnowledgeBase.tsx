@@ -1,24 +1,44 @@
 import { GlassCard, FadeIn } from "@/components/ui/design-system";
-import { Search, BookOpen, FileText, Video, Tag } from "lucide-react";
+import { Search, BookOpen, Video } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { SEO } from '@/components/seo/SEO';
+import api from '@/lib/api';
 
-const ARTICLES = [
-    { title: "App Walkthrough: From Zero to Viral", category: "Getting Started", time: "10 min read", desc: "A complete tour of the entire ViralPost ecosystem." },
-    { title: "Dashboard: Mastering Your Command Center", category: "Features", time: "3 min read", desc: "Understanding Viral Scores, ROI stats, and platform health." },
-    { title: "Wizard: Setting Up Your First Campaign", category: "Setup", time: "5 min read", desc: "How to use the engine bay to configure projects and personas." },
-    { title: "Content Studio: Creating Magic", category: "Creation", time: "7 min read", desc: "Using AI, trending data, and multi-platform previews." },
-    { title: "Calendar: Scheduling for Success", category: "Planning", time: "4 min read", desc: "Drag-and-drop workflow and viral daily drops." },
-    { title: "Support: Getting Help When You Need It", category: "Support", time: "2 min read", desc: "How to file tickets and use the self-service portal." },
-    { title: "Settings: Managing Your Account", category: "Admin", time: "3 min read", desc: "Billing, team members, and API keys." },
-];
+interface Article {
+    id: number;
+    title: string;
+    category: string;
+    time: string;
+    description: string;
+}
 
 export function KnowledgeBase() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const filtered = ARTICLES.filter(a => a.title.toLowerCase().includes(search.toLowerCase()) || a.category.toLowerCase().includes(search.toLowerCase()));
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                const response = await api.get('/articles');
+                setArticles(response.data);
+            } catch (error) {
+                console.error("Failed to fetch articles", error);
+                toast.error("Failed to load knowledge base");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchArticles();
+    }, []);
+
+    const filtered = Array.isArray(articles) ? articles.filter(a =>
+        a.title.toLowerCase().includes(search.toLowerCase()) ||
+        a.category.toLowerCase().includes(search.toLowerCase())
+    ) : [];
 
     const handleVideoClick = () => {
         toast("Video player feature coming in v1.1", { icon: "🎥" });
@@ -26,6 +46,7 @@ export function KnowledgeBase() {
 
     return (
         <div className="max-w-6xl mx-auto p-8">
+            <SEO title="Knowledge Base" description="Master the viral tools." />
             <FadeIn>
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-white text-glow mb-4">Knowledge Base</h1>
@@ -49,28 +70,33 @@ export function KnowledgeBase() {
                         <BookOpen className="w-5 h-5 text-secondary" />
                         Core Guides
                     </h2>
-                    <div className="grid grid-cols-1 gap-4">
-                        {filtered.map((article, i) => (
-                            <FadeIn key={i} delay={i * 0.1}>
-                                <GlassCard hoverEffect className="flex items-center justify-between group cursor-pointer p-6" onClick={() => navigate(`/learn/${ARTICLES.indexOf(article) + 1}`)}>
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-3 rounded-lg bg-white/5 group-hover:bg-primary/20 transition-colors">
-                                            <FileText className="w-6 h-6 text-primary" />
+                    <div className="space-y-4">
+                        {loading ? (
+                            <GlassCard className="p-8 text-center text-muted-foreground">
+                                Loading library...
+                            </GlassCard>
+                        ) : filtered.length > 0 ? (
+                            <GlassCard className="space-y-1">
+                                {filtered.map((article) => (
+                                    <div
+                                        key={article.id}
+                                        onClick={() => navigate(`/learn/${article.id}`)}
+                                        className="block text-sm text-muted-foreground hover:text-primary transition-colors flex items-center justify-between group py-3 border-b border-white/5 last:border-0 cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-medium">{article.title}</span>
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary/80 transition-colors">
+                                                {article.category}
+                                            </span>
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold text-white group-hover:text-primary transition-colors text-lg">{article.title}</h3>
-                                            <p className="text-sm text-gray-400 mt-1">{article.desc}</p>
-                                            <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-                                                <span className="flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded"><Tag className="w-3 h-3" /> {article.category}</span>
-                                                <span>•</span>
-                                                <span>{article.time}</span>
-                                            </div>
+                                        <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="text-xs">{article.time}</span>
+                                            <BookOpen className="w-3 h-3" />
                                         </div>
                                     </div>
-                                </GlassCard>
-                            </FadeIn>
-                        ))}
-                        {filtered.length === 0 && (
+                                ))}
+                            </GlassCard>
+                        ) : (
                             <div className="text-center text-muted-foreground py-8">
                                 No articles found matching "{search}"
                             </div>
@@ -89,7 +115,6 @@ export function KnowledgeBase() {
                                 <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1" />
                             </div>
                         </div>
-                        {/* Placeholder image removed to prevent 404 logs, using CSS placeholder instead */}
                         <div className="w-full h-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center text-muted-foreground text-sm">
                             Walkthrough Thumbnail
                         </div>

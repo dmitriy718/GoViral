@@ -151,18 +151,19 @@ export const getWorkspaces = async (req: Request, res: Response) => {
         }
 
         // Clean up duplicates if any exist (Self-healing)
-        if (workspaces.filter(w => w.name === 'Default Workspace').length > 1) {
-            const defaults = workspaces.filter(w => w.name === 'Default Workspace');
+        type WorkspaceLike = { id: string; name: string; createdAt: Date };
+        if (workspaces.filter((w: WorkspaceLike) => w.name === 'Default Workspace').length > 1) {
+            const defaults = workspaces.filter((w: WorkspaceLike) => w.name === 'Default Workspace');
             // Keep the oldest, delete others
-            const toKeep = defaults.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
-            const toDelete = defaults.filter(w => w.id !== toKeep.id);
+            const toKeep = defaults.sort((a: WorkspaceLike, b: WorkspaceLike) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+            const toDelete = defaults.filter((w: WorkspaceLike) => w.id !== toKeep.id);
 
             for (const ws of toDelete) {
                 // Delete members first due to foreign key
                 await prisma.workspaceMember.deleteMany({ where: { workspaceId: ws.id } });
                 await prisma.workspace.delete({ where: { id: ws.id } });
             }
-            workspaces = workspaces.filter(w => !toDelete.find(d => d.id === w.id));
+            workspaces = workspaces.filter((w: WorkspaceLike) => !toDelete.find((d: WorkspaceLike) => d.id === w.id));
         }
 
         res.json(workspaces);

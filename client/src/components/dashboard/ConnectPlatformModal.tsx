@@ -1,5 +1,4 @@
-import { Dialog } from '@radix-ui/react-dialog';
-import { X, Check, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { X, Instagram, Linkedin, Twitter } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

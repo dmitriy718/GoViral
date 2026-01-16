@@ -49,7 +49,7 @@ export class AnalyticsService {
             locations: { 'USA': 40, 'UK': 20, 'Canada': 15, 'Other': 25 }
         };
 
-        const postPerformance = posts.map(p => ({
+        const postPerformance = posts.map((p: { id: string; content: string; platform: string }) => ({
             id: p.id,
             content: p.content.substring(0, 50) + '...',
             platform: p.platform,

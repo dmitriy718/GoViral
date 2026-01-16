@@ -1,5 +1,5 @@
 
-> server@1.0.0 dev
+> postdoctor-server@1.0.0 dev
 > nodemon src/index.ts
 
 [33m[nodemon] 3.1.11[39m
@@ -7,273 +7,369 @@
 [33m[nodemon] watching path(s): *.*[39m
 [33m[nodemon] watching extensions: ts,json[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Firebase Service Account file not found in config/serviceAccountKey.json
-Firebase Admin NOT initialized. Missing credentials.
-/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/lifecycle.js:79
-            throw new error_1.FirebaseAppError(error_1.AppErrorCodes.NO_APP, errorMessage);
-                  ^
-FirebaseAppError: The default Firebase app does not exist. Make sure you call initializeApp() before using any of the Firebase services.
-    at AppStore.getApp (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/lifecycle.js:79:19)
-    at FirebaseNamespaceInternals.app (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:54:35)
-    at FirebaseNamespace.app (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:256:30)
-    at FirebaseNamespace.ensureApp (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:266:24)
-    at FirebaseNamespace.fn (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:92:25)
-    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:36:27)
-    at Module._compile (node:internal/modules/cjs/loader:1761:14)
-    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
-    at node:internal/modules/cjs/loader:1893:10
-    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12) {
-  errorInfo: {
-    code: 'app/no-app',
-    message: 'The default Firebase app does not exist. Make sure you call initializeApp() before using any of the Firebase services.'
-  },
-  codePrefix: 'app'
-}
-[31m[nodemon] app crashed - waiting for file changes before starting...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Firebase Service Account file not found in config/serviceAccountKey.json
-Firebase Admin NOT initialized. Missing credentials.
-/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/lifecycle.js:79
-            throw new error_1.FirebaseAppError(error_1.AppErrorCodes.NO_APP, errorMessage);
-                  ^
-FirebaseAppError: The default Firebase app does not exist. Make sure you call initializeApp() before using any of the Firebase services.
-    at AppStore.getApp (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/lifecycle.js:79:19)
-    at FirebaseNamespaceInternals.app (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:54:35)
-    at FirebaseNamespace.app (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:256:30)
-    at FirebaseNamespace.ensureApp (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:266:24)
-    at FirebaseNamespace.fn (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/firebase-namespace.js:92:25)
-    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:36:27)
-    at Module._compile (node:internal/modules/cjs/loader:1761:14)
-    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
-    at node:internal/modules/cjs/loader:1893:10
-    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12) {
-  errorInfo: {
-    code: 'app/no-app',
-    message: 'The default Firebase app does not exist. Make sure you call initializeApp() before using any of the Firebase services.'
-  },
-  codePrefix: 'app'
-}
-[31m[nodemon] app crashed - waiting for file changes before starting...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
-Firebase Admin initialized successfully
+[dotenv@17.2.3] injecting env (8) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
 [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
-Server running on port 5000
-[0mGET /api/workspaces [32m200[0m 322.279 ms - 453[0m
-[0mPOST /api/workspaces [33m403[0m 17.749 ms - 84[0m
-[0mGET /api/workspaces [36m304[0m 6.525 ms - -[0m
-[0mGET /api/competitors [32m200[0m 20.861 ms - 2[0m
-[0mGET /api/competitors [36m304[0m 1.854 ms - -[0m
-[0mPOST /api/workspaces [33m403[0m 3.353 ms - 84[0m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
 [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
 Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
 Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
+HIT ANALYTICS CONTROLLER
+[0mGET /api/workspaces [36m304[0m 90.333 ms - -[0m
+[0mGET /api/social [36m304[0m 97.638 ms - -[0m
+[0mGET /api/analytics/dashboard [36m304[0m 100.773 ms - -[0m
+HIT ANALYTICS CONTROLLER
+[0mGET /api/competitors [36m304[0m 114.881 ms - -[0m
+[0mGET /api/social [36m304[0m 1.991 ms - -[0m
+[0mGET /api/analytics/dashboard [36m304[0m 2.038 ms - -[0m
+[0mGET /api/competitors [36m304[0m 0.799 ms - -[0m
+[0mGET /api/workspaces [36m304[0m 1.924 ms - -[0m
+[0mGET /api/trends [32m200[0m 821.358 ms - 1234[0m
+[0mGET /api/trends [32m200[0m 54.232 ms - 1233[0m
+[0mGET /api/users/me [36m304[0m 2.746 ms - -[0m
+[0mGET /api/users/me [36m304[0m 1.503 ms - -[0m
+[Automation] Checking for Auto-Pl[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
 [32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
-Firebase Admin initialized successfully
+[dotenv@17.2.3] injecting env (8) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
 [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
 [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
 Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
 Server running on port 5000
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
--node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Firebase Admin initialized successfully
+[dotenv@17.2.3] injecting env (8) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
 [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+Firebase Admin initialized successfully
 Server running on port 5000
-[0mGET /api/workspaces [32m200[0m 308.503 ms - 227[0m
-[0mGET /api/workspaces [32m200[0m 336.134 ms - 227[0m
-[0mGET /api/competitors [32m200[0m 20.378 ms - 2[0m
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (9) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
 [dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
 Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
 Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
-Server running on port 5000
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (9) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
 [dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
 Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
 Server running on port 5000
-[32m[nodemon] clean exit - waiting for changes before restart[39m
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (9) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
 Firebase Admin initialized successfully
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
 Server running on port 5000
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (9) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+Firebase Admin initialized successfully
+Server running on port 5000
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (9) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+Firebase Admin initialized successfully
+Server running on port 5000
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (14) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-factory.js:105:54)
+    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:14:39)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12) {
+  errorInfo: {
+    code: 'app/invalid-credential',
+    message: 'Service account object must contain a string "private_key" property.'
+  },
+  codePrefix: 'app'
+}
+Server running on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert [dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-factory.js:105:54)
+    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:14:39)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12) {
+  errorInfo: {
+    code: 'app/invalid-credential',
+    message: 'Service account object must contain a string "private_key" property.'
+  },
+  codePrefix: 'app'
+}
+/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/middleware/rateLimit.ts(22,33): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/rateLimit.ts(25,23): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/rateLimit.ts(39,19): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+    at createTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_m[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (14) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/controllers/post.controller.ts(42,37): error TS2554: Expected 1-3 arguments, but got 0.
+
+    at createTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14) {
+  diagnosticCodes: [ 2554 ]
+}
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (14) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-factory.js:105:54)
+    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:14:39)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12) {
+  errorInfo: {
+    code: 'app/invalid-credential',
+    message: 'Service account object must contain a string "private_key" property.'
+  },
+  codePrefix: 'app'
+}
+/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/middleware/rateLimit.ts(22,33): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/rateLimit.ts(25,23): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/rateLimit.ts(39,19): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+    at createTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/se[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+[dotenv@17.2.3] injecting env (14) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[OpenAI] Initializing client...
+[OpenAI] Key loaded (starts with sk-proj...)
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Firebase Admin initialization error: FirebaseAppError: Service account object must contain a string "private_key" property.
+    at new ServiceAccount (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:174:19)
+    at new ServiceAccountCredential (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-internal.js:118:15)
+    at Object.cert (/home/dima/Desktop/projects/GoViral/server/node_modules/firebase-admin/lib/app/credential-factory.js:105:54)
+    at Object.<anonymous> (/home/dima/Desktop/projects/GoViral/server/src/config/firebase.ts:14:39)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Module.m._compile (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/dima/Desktop/projects/GoViral/server/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12) {
+  errorInfo: {
+    code: 'app/invalid-credential',
+    message: 'Service account object must contain a string "private_key" property.'
+  },
+  codePrefix: 'app'
+}
+Server running on port 5000
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...
+[Automation] Checking for Auto-Plug candidates...
+[Automation] Checking for Auto-DM candidates...

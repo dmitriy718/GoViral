@@ -14,9 +14,15 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z.string().optional(),
   ENCRYPTION_KEY_OLD: z.string().optional(),
   MOCK_MODE: z.string().optional(),
+  SENTRY_DSN: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_SERVICE_ACCOUNT: z.string().optional(),
   ALLOW_MOCK_AUTH: z.string().optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  APP_URL: z.string().default('http://localhost:5173'),
   // Add other critical keys here
 });
 

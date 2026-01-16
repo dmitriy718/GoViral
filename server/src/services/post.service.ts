@@ -1,4 +1,4 @@
-import { Post } from '@prisma/client';
+type Post = Record<string, unknown>;
 import { prisma } from '../utils/prisma';
 import { subscriptionService } from './subscription.service';
 import { userService } from './user.service';
@@ -10,6 +10,7 @@ interface CreatePostDTO {
     mediaUrl?: string;
     platform?: string;
     scheduledAt?: string;
+    projectId?: string;
     // Automation
     autoPlugEnabled?: boolean;
     autoPlugThreshold?: number;
@@ -23,6 +24,20 @@ export class PostService {
     async createPost(userPayload: AuthenticatedUser, data: CreatePostDTO): Promise<Post> {
         // 1. Sync User (Ensure they exist in DB first)
         const user = await userService.syncUser(userPayload);
+
+        if (data.projectId) {
+            const project = await prisma.project.findFirst({
+                where: {
+                    id: data.projectId,
+                    userId: user.id
+                },
+                select: { id: true }
+            });
+
+            if (!project) {
+                throw new Error('Project not found or access denied.');
+            }
+        }
 
         // 2. Check Limits
         const { allowed, limit, plan } = await subscriptionService.checkLimit(userPayload.uid, 'posts');
@@ -39,6 +54,7 @@ export class PostService {
                 scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
                 status: data.scheduledAt ? 'SCHEDULED' : 'DRAFT',
                 userId: user.id,
+                projectId: data.projectId,
                 // Automations
                 autoPlugEnabled: data.autoPlugEnabled,
                 autoPlugThreshold: data.autoPlugThreshold,

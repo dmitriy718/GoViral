@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authenticate = void 0;
 const firebase_1 = require("../config/firebase");
+const logger_1 = require("../utils/logger");
 const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -21,16 +22,21 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         try {
             // Verify the ID token and decode its payload.
             const decodedToken = yield firebase_1.auth.verifyIdToken(token);
-            req.user = decodedToken;
+            req.user = {
+                uid: decodedToken.uid,
+                email: decodedToken.email || '',
+                name: decodedToken.name,
+                picture: decodedToken.picture
+            };
             next();
         }
         catch (firebaseError) {
-            console.error('Firebase Token Verification Failed:', firebaseError);
+            logger_1.logger.warn({ err: firebaseError }, 'Firebase token verification failed');
             return res.status(401).json({ error: 'Unauthorized: Invalid token' });
         }
     }
     catch (error) {
-        console.error('Auth Middleware Error:', error);
+        logger_1.logger.error({ err: error }, 'Auth middleware error');
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

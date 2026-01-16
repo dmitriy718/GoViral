@@ -175,11 +175,17 @@ export function Calendar() {
                         <Zap className="w-5 h-5 text-green-400" />
                         Viral Daily Drops
                     </h2>
-                    <div className="space-y-3">
-                        {VIRAL_DROPS.map((viral) => (
-                            <DraggableDraft key={viral.id} draft={viral as unknown as Post} />
-                        ))}
-                    </div>
+                    {mockMode ? (
+                        <div className="space-y-3">
+                            {VIRAL_DROPS.map((viral) => (
+                                <DraggableDraft key={viral.id} draft={viral as unknown as Post} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-xs text-muted-foreground">
+                            Viral drops are disabled in production until live feeds are connected.
+                        </p>
+                    )}
                 </div>
             </div>
 

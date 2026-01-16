@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import * as Sentry from '@sentry/node';
 import { env } from './config/env';
 import { logger } from './utils/logger';
 import { requestId } from './middleware/requestId';
@@ -19,6 +20,14 @@ import userRoutes from './routes/user.routes';
 import notionRoutes from './routes/notion.routes';
 const app = express();
 const PORT = env.PORT;
+
+if (env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: env.SENTRY_DSN,
+    environment: env.NODE_ENV,
+    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0
+  });
+}
 
 app.use(express.json({ limit: '1mb' }));
 app.use(requestId);
@@ -58,6 +67,9 @@ app.use('/api/notion', notionRoutes);
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error({ err, requestId: (req as any).id }, 'Unhandled server error');
+  if (env.SENTRY_DSN) {
+    Sentry.captureException(err);
+  }
   res.status(500).json({
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong on our end.'

@@ -10,76 +10,73 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPosts = exports.createPost = exports.generatePost = void 0;
-const client_1 = require("@prisma/client");
 const ai_service_1 = require("../services/ai.service");
-const prisma = new client_1.PrismaClient();
-const generatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { keywords, tone, postType, platform } = req.body;
-        if (!keywords || !tone || !postType) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-        const suggestions = yield ai_service_1.aiService.generatePost({
-            keywords,
-            tone,
-            postType,
-            platform: platform || 'twitter'
-        });
-        res.json({ suggestions });
+const post_service_1 = require("../services/post.service");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const subscription_service_1 = require("../services/subscription.service");
+const user_service_1 = require("../services/user.service");
+const prisma_1 = require("../utils/prisma");
+exports.generatePost = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
     }
-    catch (error) {
-        console.error('Generation error:', error);
-        res.status(500).json({ error: 'Failed to generate content' });
+    const { keywords, tone, postType, platform, includeMedia } = req.body;
+    yield user_service_1.userService.syncUser(req.user);
+    const { allowed, limit, plan } = yield subscription_service_1.subscriptionService.checkLimit(req.user.uid, 'aiGenerations');
+    if (!allowed) {
+        res.status(403).json({
+            error: `Plan limit reached (${plan})`,
+            message: `You have reached the limit of ${limit} AI generations for your ${plan} plan.`
+        });
+        return;
     }
-});
-exports.generatePost = generatePost;
-const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { content, mediaUrl, platform, scheduledAt } = req.body;
-        const userPayload = req.user; // Attached by auth middleware
-        // Sync user to local DB
-        let user = yield prisma.user.findUnique({
-            where: { email: userPayload.email }
-        });
-        if (!user) {
-            user = yield prisma.user.create({
-                data: {
-                    id: userPayload.uid, // Use Firebase UID as primary key if possible, or keep UUID and map it. 
-                    // Actually schema has UUID default. Let's keep UUID for internal and store firebaseId? 
-                    // Schema not updated for firebaseId. Let's used email as unique identifier for now and create.
-                    email: userPayload.email,
-                    password: 'firebase_oauth_user', // Placeholder
-                    name: userPayload.name || userPayload.email.split('@')[0]
-                }
-            });
+    const suggestions = yield ai_service_1.aiService.generatePost({
+        keywords,
+        tone,
+        postType,
+        platform: platform || 'twitter',
+        includeMedia,
+        generationMode: req.body.generationMode || 'mix'
+    });
+    yield prisma_1.prisma.aiGeneration.create({
+        data: {
+            userId: req.user.uid
         }
-        const post = yield prisma.post.create({
-            data: {
-                content,
-                mediaUrl,
-                platform: platform || 'twitter',
-                scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-                status: scheduledAt ? 'SCHEDULED' : 'DRAFT',
-                userId: user.id
-            }
-        });
+    });
+    res.json({ suggestions });
+}));
+exports.createPost = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+    }
+    try {
+        const post = yield post_service_1.postService.createPost(req.user, req.body);
         res.json(post);
     }
     catch (error) {
-        console.error('Create post error:', error);
-        res.status(500).json({ error: 'Failed to create post' });
+        // Handle service-level errors (like limits)
+        if (error.message.includes('Plan limit')) {
+            res.status(403).json({ error: error.message });
+            return;
+        }
+        if (error.message.includes('Project not found')) {
+            res.status(403).json({ error: error.message });
+            return;
+        }
+        throw error;
     }
-});
-exports.createPost = createPost;
-const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const posts = yield prisma.post.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
-        res.json(posts);
+}));
+exports.getPosts = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
     }
-    catch (error) {
-        res.status(500).json({ error: 'Failed to fetch posts' });
-    }
-});
-exports.getPosts = getPosts;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
+    const limit = limitParam ? Math.min(parseInt(String(limitParam), 10) || 50, 200) : 50;
+    const status = statusParam ? String(statusParam).toUpperCase() : undefined;
+    const posts = yield post_service_1.postService.getPosts(req.user.uid, limit, status);
+    res.json(posts);
+}));

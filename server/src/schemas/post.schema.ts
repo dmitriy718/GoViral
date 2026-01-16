@@ -6,6 +6,7 @@ export const createPostSchema = z.object({
         mediaUrl: z.string().url().optional().or(z.literal('')),
         platform: z.enum(['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']).optional(),
         scheduledAt: z.string().datetime().optional(),
+        projectId: z.string().uuid().optional(),
         // Automation
         autoPlugEnabled: z.boolean().optional(),
         autoPlugThreshold: z.number().optional(),

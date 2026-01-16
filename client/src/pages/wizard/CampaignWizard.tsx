@@ -22,58 +22,63 @@ const PLATFORMS = [
     { id: 'email', name: 'Email / Newsletter', color: 'bg-green-600' },
 ];
 
+import { SEO } from '@/components/seo/SEO';
+
 export function CampaignWizard() {
     const { currentStep, isNewProject, projectData, setStep, setProjectMode, updateProjectData } = useCampaignStore();
 
     // Step 0: Welcome / New or Existing
     if (currentStep === 0) {
         return (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center p-8">
-                <FadeIn>
-                    <div className="text-center mb-12">
-                        <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-4 text-glow">
-                            Let's Create Magic.
-                        </h1>
-                        <p className="text-xl text-muted-foreground">Start your journey to viral status.</p>
+            <>
+                <SEO title="Campaign Wizard" description="Build your viral campaign." />
+                <div className="min-h-[80vh] flex flex-col items-center justify-center p-8">
+                    <FadeIn>
+                        <div className="text-center mb-12">
+                            <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-4 text-glow">
+                                Let's Create Magic.
+                            </h1>
+                            <p className="text-xl text-muted-foreground">Start your journey to viral status.</p>
+                        </div>
+                    </FadeIn>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+                        <FadeIn delay={0.2}>
+                            <button
+                                onClick={() => { setProjectMode(true); setStep(1); }}
+                                className="group w-full text-left"
+                            >
+                                <GlassCard className="h-64 flex flex-col justify-center items-center gap-6 group-hover:bg-primary/10 transition-all border-primary/20 hover:border-primary/50">
+                                    <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+                                        <Plus className="w-10 h-10 text-primary" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h3 className="text-2xl font-bold text-white mb-2">Start New Project</h3>
+                                        <p className="text-muted-foreground">Launch a fresh campaign from scratch.</p>
+                                    </div>
+                                </GlassCard>
+                            </button>
+                        </FadeIn>
+
+                        <FadeIn delay={0.4}>
+                            <button
+                                onClick={() => { setProjectMode(false); setStep(1); }}
+                                className="group w-full text-left"
+                            >
+                                <GlassCard className="h-64 flex flex-col justify-center items-center gap-6 group-hover:bg-secondary/10 transition-all border-secondary/20 hover:border-secondary/50">
+                                    <div className="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(236,72,153,0.3)]">
+                                        <FolderOpen className="w-10 h-10 text-secondary" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h3 className="text-2xl font-bold text-white mb-2">Continue Existing</h3>
+                                        <p className="text-muted-foreground">Pick up where you left off.</p>
+                                    </div>
+                                </GlassCard>
+                            </button>
+                        </FadeIn>
                     </div>
-                </FadeIn>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-                    <FadeIn delay={0.2}>
-                        <button
-                            onClick={() => { setProjectMode(true); setStep(1); }}
-                            className="group w-full text-left"
-                        >
-                            <GlassCard className="h-64 flex flex-col justify-center items-center gap-6 group-hover:bg-primary/10 transition-all border-primary/20 hover:border-primary/50">
-                                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(99,102,241,0.3)]">
-                                    <Plus className="w-10 h-10 text-primary" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-white mb-2">Start New Project</h3>
-                                    <p className="text-muted-foreground">Launch a fresh campaign from scratch.</p>
-                                </div>
-                            </GlassCard>
-                        </button>
-                    </FadeIn>
-
-                    <FadeIn delay={0.4}>
-                        <button
-                            onClick={() => { setProjectMode(false); setStep(1); }}
-                            className="group w-full text-left"
-                        >
-                            <GlassCard className="h-64 flex flex-col justify-center items-center gap-6 group-hover:bg-secondary/10 transition-all border-secondary/20 hover:border-secondary/50">
-                                <div className="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(236,72,153,0.3)]">
-                                    <FolderOpen className="w-10 h-10 text-secondary" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-white mb-2">Continue Existing</h3>
-                                    <p className="text-muted-foreground">Pick up where you left off.</p>
-                                </div>
-                            </GlassCard>
-                        </button>
-                    </FadeIn>
                 </div>
-            </div>
+            </>
         );
     }
 
@@ -83,6 +88,7 @@ export function CampaignWizard() {
             // SELECT EXISTING
             return (
                 <div className="max-w-4xl mx-auto p-8">
+                    <SEO title="Campaign Wizard" description="Select your project." />
                     <PageHeader title="Select a Project" subtitle="Choose from your active campaigns." />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {PRIOR_PROJECTS.map(p => (
@@ -100,6 +106,7 @@ export function CampaignWizard() {
         // CREATE NEW
         return (
             <div className="max-w-3xl mx-auto p-8">
+                <SEO title="Campaign Wizard" description="Create a new project." />
                 <FadeIn>
                     <PageHeader title="Project Details" subtitle="Tell us about what we're building." />
 
@@ -211,7 +218,7 @@ function PersonaWizard() {
             await createProject(projectData);
             toast.success("Campaign launched successfully!", { id: loadingToast });
             navigate('/create');
-        } catch (error) {
+        } catch {
             toast.error("Failed to launch campaign.", { id: loadingToast });
         } finally {
             setIsSaving(false);
@@ -264,8 +271,8 @@ function PersonaWizard() {
 
                         <div className="flex justify-end gap-3 pt-4">
                             <button onClick={() => setPersonaMode('list')} className="px-4 py-2 text-muted-foreground">Cancel</button>
-                            <button onClick={finish} className="bg-secondary text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-secondary/20 hover:scale-105 transition-transform">
-                                Create & Launch 🚀
+                            <button onClick={finish} disabled={isSaving} className="bg-secondary text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-secondary/20 hover:scale-105 transition-transform disabled:opacity-50">
+                                {isSaving ? "Launching..." : "Create & Launch 🚀"}
                             </button>
                         </div>
                     </GlassCard>
@@ -276,6 +283,7 @@ function PersonaWizard() {
 
     return (
         <div className="max-w-5xl mx-auto p-8">
+            <SEO title="Campaign Wizard" description="Select a persona." />
             <FadeIn>
                 <PageHeader title="Select a Persona" subtitle={`Who will be speaking for "${projectData.name}"?`} />
 

@@ -1,4 +1,4 @@
-import { Integration } from '@prisma/client';
+type Integration = Record<string, unknown>;
 import { prisma } from '../utils/prisma';
 import { encrypt, decrypt } from '../utils/crypto';
 import { env } from '../config/env';
