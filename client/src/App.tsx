@@ -27,7 +27,7 @@ const ActivityLog = lazy(() => import('./pages/ActivityLog').then((m) => ({ defa
 import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
 
 const RouteFallback = () => (
-  <div className="h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
+  <div data-testid="page-loader" className="h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
     Loading...
   </div>
 );

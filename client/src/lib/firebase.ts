@@ -13,13 +13,15 @@ const firebaseConfig = {
 };
 
 const hasConfig = Object.values(firebaseConfig).every((value) => Boolean(value));
+const isTest = import.meta.env.MODE === 'test' || import.meta.env.VITE_MOCK_MODE === 'true';
 
-if (!hasConfig) {
+if (!hasConfig && !isTest) {
   console.error('Firebase config is missing. Check VITE_FIREBASE_* environment variables.');
   throw new Error('Firebase configuration missing');
 }
 
-const app = initializeApp(firebaseConfig);
+// Initialize with dummy data if missing but in test mode
+const app = initializeApp(hasConfig ? firebaseConfig : { apiKey: 'dummy', authDomain: 'dummy', projectId: 'dummy' });
 export const auth = getAuth(app);
 export const analytics = getAnalytics(app);
 export const googleProvider = new GoogleAuthProvider();

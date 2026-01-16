@@ -51,24 +51,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // E2E Test Bypass
+    const testUser = window.localStorage.getItem('__E2E_USER_BYPASS__');
+    if (testUser) {
+        try {
+            const parsed = JSON.parse(testUser);
+            setUser(parsed);
+            fetchDbUser();
+            setLoading(false);
+            return;
+        } catch (e) {
+            console.error("Failed to parse test user", e);
+        }
+    }
+
     // Set persistence to LOCAL so users stay logged in across refresh
-    setPersistence(auth, browserLocalPersistence)
-      .then(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-          setUser(currentUser);
-          if (currentUser) {
-            await fetchDbUser();
-          } else {
-            setDbUser(null);
-          }
-          setLoading(false);
-        });
-        return unsubscribe;
-      })
-      .catch((error) => {
-        console.error("Auth persistence error:", error);
-        setLoading(false);
-      });
+    try {
+        setPersistence(auth, browserLocalPersistence)
+          .then(() => {
+            const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+              setUser(currentUser);
+              if (currentUser) {
+                await fetchDbUser();
+              } else {
+                setDbUser(null);
+              }
+              setLoading(false);
+            });
+            return unsubscribe;
+          })
+          .catch((error) => {
+            console.error("Auth persistence error:", error);
+            setLoading(false);
+          });
+    } catch (e) {
+        console.warn("Firebase Auth not fully available, likely in test mode", e);
+        // In test mode, we might rely on init scripts to set state
+        // or just let it stay in loading state if we mock the whole context
+        setLoading(false); 
+    }
   }, []);
 
   const signInWithGoogle = async () => {

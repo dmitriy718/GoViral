@@ -45,9 +45,12 @@ export function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-background relative overflow-hidden">
-      <Sidebar />
-      <main className={`flex-1 overflow-y-auto flex flex-col transition-all duration-500 ${isUnverified ? 'blur-md pointer-events-none' : ''}`}>
+    <div className="flex h-screen bg-background relative overflow-hidden" data-testid="layout-root">
+      <div data-testid="sidebar-container"><Sidebar /></div>
+      <main 
+        data-testid="main-content"
+        className={`flex-1 overflow-y-auto flex flex-col transition-all duration-500 ${isUnverified ? 'blur-md pointer-events-none' : ''}`}
+      >
         {/* Beta Offer Banner */}
         <div 
             onClick={() => navigate('/settings')}
