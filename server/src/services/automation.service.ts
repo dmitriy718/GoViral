@@ -30,7 +30,7 @@ export class AutomationService {
         });
 
         // Parallelize processing
-        await Promise.allSettled(activePlugs.map(post => this.processAutoPlug(post)));
+        await Promise.allSettled(activePlugs.map((post: any) => this.processAutoPlug(post)));
 
         // 2. Check Auto-DM Triggers
         logger.info('Checking for Auto-DM candidates');
@@ -41,7 +41,7 @@ export class AutomationService {
             }
         });
 
-        await Promise.allSettled(activeDMs.map(post => this.processAutoDM(post)));
+        await Promise.allSettled(activeDMs.map((post: any) => this.processAutoDM(post)));
     }
 
     private async processAutoPlug(post: Post) {
