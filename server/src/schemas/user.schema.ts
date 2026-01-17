@@ -7,3 +7,9 @@ export const updateProfileSchema = z.object({
     avatarUrl: z.string().max(500).optional().nullable().or(z.literal('')),
   }),
 });
+
+export const verifyEmailSchema = z.object({
+  body: z.object({
+    token: z.string().min(32, "Invalid token format"),
+  }),
+});

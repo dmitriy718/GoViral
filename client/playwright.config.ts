@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4173';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
 export default defineConfig({
   testDir: './tests',
@@ -15,10 +15,19 @@ export default defineConfig({
     ignoreHTTPSErrors: true
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4173',
+    command: 'npm run dev -- --host 127.0.0.1 --port 5173',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120000
+    timeout: 120000,
+    env: {
+        NODE_ENV: 'test',
+        VITE_FIREBASE_API_KEY: 'test',
+        VITE_FIREBASE_AUTH_DOMAIN: 'test',
+        VITE_FIREBASE_PROJECT_ID: 'test',
+        VITE_FIREBASE_STORAGE_BUCKET: 'test',
+        VITE_FIREBASE_MESSAGING_SENDER_ID: 'test',
+        VITE_FIREBASE_APP_ID: 'test',
+    }
   },
   projects: [
     {

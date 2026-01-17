@@ -135,6 +135,102 @@ class EmailService {
       logger.error({ err: error, to }, 'Failed to send access granted email');
     }
   }
+
+  async sendContactAutoReply(to: string, name: string) {
+    const html = baseTemplate(`
+      <div class="badge">Support</div>
+      <h1>We've received your message! 👋</h1>
+      <p>Hi ${name},</p>
+      <p>Thanks for reaching out to PostDoctor. This is just a quick note to let you know that we've received your inquiry and our team is already on it.</p>
+      <p>We typically respond within 24 hours. If your matter is urgent, please feel free to check our <a href="${env.APP_URL}/learn">Knowledge Base</a> in the meantime.</p>
+      <p>Talk soon,<br>The PostDoctor Team</p>
+    `);
+
+    try {
+      await this.transporter.sendMail({
+        from: `"PostDoctor Support" <${env.SMTP_USER}>`,
+        to,
+        subject: 'Re: We received your message 📩',
+        html,
+      });
+    } catch (error) {
+      logger.error({ err: error, to }, 'Failed to send contact auto-reply');
+    }
+  }
+
+  async sendTicketCreatedEmail(to: string, name: string, ticketId: string, subject: string) {
+    const html = baseTemplate(`
+      <div class="badge">New Ticket</div>
+      <h1>Ticket Created: #${ticketId}</h1>
+      <p>Hi ${name},</p>
+      <p>Your support ticket has been successfully opened. We're looking into your issue and will get back to you as soon as possible.</p>
+      <div style="background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 24px 0;">
+        <p style="margin: 0; font-weight: bold; color: #374151;">Subject:</p>
+        <p style="margin: 4px 0 0; color: #4b5563;">${subject}</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="${env.APP_URL}/support" class="button">View Ticket Status</a>
+      </div>
+    `);
+
+    try {
+      await this.transporter.sendMail({
+        from: `"PostDoctor Help Desk" <${env.SMTP_USER}>`,
+        to,
+        subject: `[Ticket #${ticketId}] ${subject}`,
+        html,
+      });
+    } catch (error) {
+      logger.error({ err: error, to }, 'Failed to send ticket created email');
+    }
+  }
+
+  async sendTicketUpdatedEmail(to: string, name: string, ticketId: string, status: string) {
+    const html = baseTemplate(`
+      <div class="badge">Update</div>
+      <h1>Ticket Update: #${ticketId}</h1>
+      <p>Hi ${name},</p>
+      <p>The status of your support ticket has been updated to: <strong>${status}</strong>.</p>
+      <div style="text-align: center;">
+        <a href="${env.APP_URL}/support" class="button">View Update</a>
+      </div>
+      <p style="margin-top: 24px;">If you have any further questions, simply reply to this email or update the ticket in your dashboard.</p>
+    `);
+
+    try {
+      await this.transporter.sendMail({
+        from: `"PostDoctor Help Desk" <${env.SMTP_USER}>`,
+        to,
+        subject: `Update on Ticket #${ticketId}`,
+        html,
+      });
+    } catch (error) {
+      logger.error({ err: error, to }, 'Failed to send ticket updated email');
+    }
+  }
+
+  async sendTicketClosedEmail(to: string, name: string, ticketId: string) {
+    const html = baseTemplate(`
+      <div class="badge">Resolved</div>
+      <h1>Ticket Closed: #${ticketId}</h1>
+      <p>Hi ${name},</p>
+      <p>We've marked your support ticket as **Resolved**. We hope we were able to help you effectively.</p>
+      <p>If your issue persists or you have a new question, please don't hesitate to open a new ticket.</p>
+      <p>How did we do? Feel free to reply and let us know.</p>
+      <p>Best,<br>The PostDoctor Support Team</p>
+    `);
+
+    try {
+      await this.transporter.sendMail({
+        from: `"PostDoctor Help Desk" <${env.SMTP_USER}>`,
+        to,
+        subject: `Ticket #${ticketId} has been closed`,
+        html,
+      });
+    } catch (error) {
+      logger.error({ err: error, to }, 'Failed to send ticket closed email');
+    }
+  }
 }
 
 export const emailService = new EmailService();

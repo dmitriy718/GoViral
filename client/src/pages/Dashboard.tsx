@@ -55,10 +55,17 @@ export function Dashboard() {
 
     useEffect(() => {
         if (!user) return;
-        loadCompetitors();
-        loadStats();
-        loadTrends();
-        loadSocials();
+        
+        const initDashboard = async () => {
+            await Promise.all([
+                loadCompetitors(),
+                loadStats(),
+                loadTrends(),
+                loadSocials()
+            ]);
+        };
+
+        initDashboard();
     }, [user]);
 
     const loadSocials = async () => {

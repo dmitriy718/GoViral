@@ -26,13 +26,11 @@ export class AutomationService {
             where: {
                 status: 'PUBLISHED',
                 autoPlugEnabled: true,
-                // In a real app, we'd filter out already-replied posts.
             }
         });
 
-        for (const post of activePlugs) {
-            await this.processAutoPlug(post);
-        }
+        // Parallelize processing
+        await Promise.allSettled(activePlugs.map(post => this.processAutoPlug(post)));
 
         // 2. Check Auto-DM Triggers
         logger.info('Checking for Auto-DM candidates');
@@ -43,9 +41,7 @@ export class AutomationService {
             }
         });
 
-        for (const post of activeDMs) {
-            await this.processAutoDM(post);
-        }
+        await Promise.allSettled(activeDMs.map(post => this.processAutoDM(post)));
     }
 
     private async processAutoPlug(post: Post) {

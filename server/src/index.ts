@@ -7,6 +7,7 @@ import { env } from './config/env';
 import { logger } from './utils/logger';
 import { requestId } from './middleware/requestId';
 import { metricsMiddleware, getMetrics } from './middleware/metrics';
+import { rateLimit } from './middleware/rateLimit';
 import postRoutes from './routes/post.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import projectRoutes from './routes/project.routes';
@@ -18,8 +19,15 @@ import socialRoutes from './routes/social.routes';
 import articleRoutes from './routes/article.routes';
 import userRoutes from './routes/user.routes';
 import notionRoutes from './routes/notion.routes';
+
 const app = express();
 const PORT = env.PORT;
+
+// Global Rate Limiter
+const globalLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100 // 100 requests per minute per IP
+});
 
 if (env.SENTRY_DSN) {
   Sentry.init({
@@ -29,9 +37,11 @@ if (env.SENTRY_DSN) {
   });
 }
 
+app.use(globalLimit);
 app.use(express.json({ limit: '1mb' }));
 app.use(requestId);
 app.use(metricsMiddleware);
+
 const allowedOrigins = (env.CORS_ORIGIN || env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim())

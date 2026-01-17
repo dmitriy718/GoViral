@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Content Creation Flow', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    await context.addInitScript(() => {
+      window.localStorage.setItem('__E2E_USER_BYPASS__', JSON.stringify({ uid: '123', email: 'v@test.com' }));
+    });
+
     await page.route('**/api/users/me', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: '123', email: 'v@test.com', emailVerified: true }) });
     });
@@ -12,14 +16,11 @@ test.describe('Content Creation Flow', () => {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
 
-    await page.addInitScript(() => {
-      window.localStorage.setItem('__E2E_USER_BYPASS__', JSON.stringify({ uid: '123', email: 'v@test.com' }));
-    });
-
     await page.goto('/create');
   });
 
   test('can generate and schedule a post', async ({ page }) => {
+    await expect(page.getByTestId('layout-root')).toBeVisible({ timeout: 15000 });
     await page.locator('textarea').first().fill('Test AI Topic');
 
     await page.route('**/api/posts/generate', async (route) => {

@@ -36,9 +36,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // Synchronous E2E Bypass Check for testing stability
+  const getInitialState = () => {
+    const testUser = typeof window !== 'undefined' ? window.localStorage.getItem('__E2E_USER_BYPASS__') : null;
+    if (testUser) {
+        try {
+            const parsed = JSON.parse(testUser);
+            console.log("INITIAL BYPASS DETECTED:", parsed);
+            return { user: parsed, loading: false };
+        } catch (e) { 
+            console.error("BYPASS PARSE ERROR:", e);
+        }
+    }
+    return { user: null, loading: true };
+  };
+
+  const initialState = getInitialState();
+  const [user, setUser] = useState<User | null>(initialState.user);
   const [dbUser, setDbUser] = useState<DbUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialState.loading);
 
   const fetchDbUser = async () => {
     try {
@@ -46,23 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setDbUser(profile);
     } catch (error) {
       console.error("Failed to fetch DB profile", error);
-      // Don't toast here to avoid spam on initial load if backend is down
     }
   };
 
   useEffect(() => {
-    // E2E Test Bypass
-    const testUser = window.localStorage.getItem('__E2E_USER_BYPASS__');
-    if (testUser) {
-        try {
-            const parsed = JSON.parse(testUser);
-            setUser(parsed);
-            fetchDbUser();
-            setLoading(false);
-            return;
-        } catch (e) {
-            console.error("Failed to parse test user", e);
-        }
+    if (initialState.user) {
+        fetchDbUser();
+        return;
     }
 
     // Set persistence to LOCAL so users stay logged in across refresh

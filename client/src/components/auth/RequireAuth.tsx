@@ -9,7 +9,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
     if (loading) {
         return (
-            <div className="h-screen w-full flex items-center justify-center bg-background">
+            <div data-testid="auth-loader" className="h-screen w-full flex items-center justify-center bg-background">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
