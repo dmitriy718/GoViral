@@ -12,7 +12,12 @@ const createAdmin = async () => {
     // I will use "admin@postdoctor.app" and log it.
 
     const targetEmail = 'admin@postdoctor.app';
-    const password = 'DimaZ7188!';
+    const password = process.env.ADMIN_PASSWORD;
+
+    if (!password) {
+        console.error('Error: ADMIN_PASSWORD environment variable is required.');
+        process.exit(1);
+    }
 
     try {
         // Check if user exists
