@@ -42,9 +42,9 @@ try {
     }
 }
 
-const allowMockAuth = process.env.ALLOW_MOCK_AUTH === 'true' && process.env.NODE_ENV !== 'production';
+const allowMockAuth = process.env.ALLOW_MOCK_AUTH === 'true' && (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
 const notInitialized = async () => {
-    throw new Error('Firebase Admin is not initialized. Provide credentials or enable ALLOW_MOCK_AUTH in non-production.');
+    throw new Error('Firebase Admin is not initialized. Provide credentials or enable ALLOW_MOCK_AUTH in development/test.');
 };
 
 // Safe export that doesn't crash if app not initialized
