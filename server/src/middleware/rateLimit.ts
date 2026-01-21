@@ -1,4 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
+import Redis from 'ioredis';
+import { env } from '../config/env';
+import { logger } from '../utils/logger';
+
+// Initialize Redis client
+// We use a separate client for rate limiting to avoid blocking other operations if we had a shared client
+const redis = new Redis(env.DATABASE_URL?.includes('redis') ? env.DATABASE_URL : process.env.REDIS_URL || 'redis://localhost:6379');
+
+redis.on('error', (err) => {
+    logger.warn({ err }, 'Redis rate limiter error, falling back to permissive mode');
+});
 
 interface RateLimitOptions {
     windowMs: number;
@@ -6,37 +17,36 @@ interface RateLimitOptions {
     keyGenerator?: (req: Request) => string;
 }
 
-interface RateLimitState {
-    count: number;
-    resetAt: number;
-}
-
-const store = new Map<string, RateLimitState>();
-
 export const rateLimit = (options: RateLimitOptions) => {
     const { windowMs, max, keyGenerator } = options;
 
-    return (req: Request, res: Response, next: NextFunction) => {
-        const key = (keyGenerator ? keyGenerator(req) : req.ip) || 'unknown';
-        const now = Date.now();
-        const entry = store.get(key);
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const key = `ratelimit:${(keyGenerator ? keyGenerator(req) : req.ip) || 'unknown'}`;
+            
+            // Increment the key
+            const current = await redis.incr(key);
+            
+            // If it's the first time, set the expiry
+            if (current === 1) {
+                await redis.expire(key, Math.ceil(windowMs / 1000));
+            }
 
-        if (!entry || entry.resetAt <= now) {
-            store.set(key, { count: 1, resetAt: now + windowMs });
+            if (current > max) {
+                const ttl = await redis.ttl(key);
+                res.setHeader('Retry-After', ttl);
+                return res.status(429).json({
+                    error: 'Rate limit exceeded',
+                    message: `Too many requests. Try again in ${ttl}s.`
+                });
+            }
+
+            return next();
+        } catch (error) {
+            // Fail open if Redis is down
+            logger.error({ err: error }, 'Rate limit middleware failed');
             return next();
         }
-
-        entry.count += 1;
-        if (entry.count > max) {
-            const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
-            res.setHeader('Retry-After', String(retryAfter));
-            return res.status(429).json({
-                error: 'Rate limit exceeded',
-                message: `Too many requests. Try again in ${retryAfter}s.`
-            });
-        }
-
-        store.set(key, entry);
-        return next();
     };
 };
+

@@ -15,7 +15,12 @@ api.interceptors.request.use(async (config) => {
   const user = auth.currentUser;
   const url = config.url || '';
   const isPublic = ['/articles', '/errors/report', '/health'].some((path) => url.startsWith(path));
-  const isTest = import.meta.env.MODE === 'test' || import.meta.env.VITE_MOCK_MODE === 'true';
+  
+  // Check for E2E bypass user in localStorage
+  // SECURITY: Only allow bypass in explicit mock/test mode
+  const isMockOrTest = import.meta.env.MODE === 'test' || import.meta.env.VITE_MOCK_MODE === 'true';
+  const hasBypass = isMockOrTest && typeof window !== 'undefined' && !!window.localStorage.getItem('__E2E_USER_BYPASS__');
+  const isTest = isMockOrTest || hasBypass;
 
   if (!user && !isPublic && !isTest) {
     return Promise.reject(new axios.Cancel('auth-not-ready'));

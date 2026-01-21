@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
+import hpp from 'hpp';
 import * as Sentry from '@sentry/node';
 import { env } from './config/env';
 import { logger } from './utils/logger';
@@ -26,7 +28,7 @@ const PORT = env.PORT;
 // Global Rate Limiter
 const globalLimit = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100 // 100 requests per minute per IP
+  max: 300 // Increased for production assets/polling
 });
 
 if (env.SENTRY_DSN) {
@@ -36,6 +38,11 @@ if (env.SENTRY_DSN) {
     tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0
   });
 }
+
+// Security & Performance Middleware
+app.use(helmet());
+app.use(compression());
+app.use(hpp());
 
 app.use(globalLimit);
 app.use(express.json({ limit: '1mb' }));

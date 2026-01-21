@@ -38,6 +38,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Synchronous E2E Bypass Check for testing stability
   const getInitialState = () => {
+    // SECURITY: Only allow bypass in explicit mock/test mode
+    if (import.meta.env.VITE_MOCK_MODE !== 'true' && import.meta.env.MODE !== 'test') {
+        return { user: null, loading: true };
+    }
+
     const testUser = typeof window !== 'undefined' ? window.localStorage.getItem('__E2E_USER_BYPASS__') : null;
     if (testUser) {
         try {
