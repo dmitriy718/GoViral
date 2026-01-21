@@ -1,9 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const baseURL = process.env.VPS_URL || 'http://74.208.153.193';
+const baseURL = process.env.VPS_URL || 'https://postdoctor.app';
 
 export default defineConfig({
   testDir: './tests',
