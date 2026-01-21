@@ -21,9 +21,35 @@ Starting comprehensive audit of the GoViral codebase.
 2.  **Env Validation**: Tightened `server/src/config/env.ts` to require `DATABASE_URL` and Firebase keys.
 3.  **Client Auth**: Guarded `__E2E_USER_BYPASS__` in `AuthContext` and `api.ts` with strict `VITE_MOCK_MODE` or `MODE='test'` checks.
 
-## Phase 3: Production Enhancements
+## Phase 4: Second Review & Optimization
 
 ### Completed
-1.  **Performance**: Added `compression` middleware to server for Gzip/Brotli support.
-2.  **Security**: Added `hpp` (HTTP Parameter Pollution) middleware to server.
-3.  **Client Bundle**: Verified `vite.config.ts` already has optimal `manualChunks` splitting (separating vendor, firebase, charts, etc.).
+1.  **Server Build Fix**: Resolved type mismatch between `bullmq` and `ioredis` in `server/src/utils/queue.ts` by casting connection options.
+2.  **Client Lint**: Fixed linting errors in `AuthContext.tsx` regarding `useEffect` dependencies and `setState`.
+
+## Phase 5: Testing
+
+### Completed
+1.  **Prod Config**: Created `client/playwright.prod.config.ts` to target the live VPS.
+2.  **Smoke Tests**: Created `client/tests/prod.spec.ts` to verify public routes and login page availability.
+3.  **Result**: Tests failed against VPS `74.208.153.193`.
+
+## Phase 6: Deploy & Validate
+
+### Findings
+- **Deployment Mismatch**: The production VPS is currently serving the "Carolina Growth" application (Title: "Carolina Growth | Local growth studio") instead of GoViral/PostDoctor.
+- **Validation**: Smoke tests failed due to this mismatch (Title expectation failed: expected /PostDoctor/i, got "Carolina Growth...").
+- **Action**: Logged this critical infrastructure issue in `FinalRequirements.md`.
+
+## Phase 7: Documentation & Wrap-Up
+
+### Summary
+The GoViral codebase has been audited, hardened, and prepped for production.
+- **Security**: Auth bypass is now strictly guarded. Env vars are validated.
+- **Performance**: Rate limiting uses Redis. Compression and HPP enabled.
+- **Quality**: Type errors fixed, linting passed.
+
+### Next Steps
+1.  **Resolve VPS Deployment**: The VPS needs to be updated to serve the correct GoViral/PostDoctor application.
+2.  **Secrets**: Provide `FIREBASE_SERVICE_ACCOUNT` and `DATABASE_URL` (Redis enabled) to the production environment.
+3.  **Run Tests**: Once deployed, run `npx playwright test --config client/playwright.prod.config.ts` to verify.
