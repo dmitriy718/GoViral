@@ -13,7 +13,7 @@ const connection = new IORedis({
 });
 
 export const publishQueue = new Queue('publish-posts', {
-    connection,
+    connection: connection as any,
     defaultJobOptions: {
         attempts: 5,
         backoff: { type: 'exponential', delay: 5000 },
@@ -22,7 +22,7 @@ export const publishQueue = new Queue('publish-posts', {
     }
 });
 
-const publishQueueEvents = new QueueEvents('publish-posts', { connection });
+const publishQueueEvents = new QueueEvents('publish-posts', { connection: connection as any });
 publishQueueEvents.on('failed', ({ jobId, failedReason }) => {
     logger.error({ jobId, failedReason }, 'Publish queue job failed');
 });
@@ -35,7 +35,7 @@ export const startPublishWorker = () => {
             data: { status: 'PUBLISHED' }
         });
     }, {
-        connection,
+        connection: connection as any,
         concurrency: 5,
         lockDuration: 30000
     });

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import {
   signInWithPopup,
   signOut,
@@ -61,17 +61,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [dbUser, setDbUser] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState(initialState.loading);
 
-  const fetchDbUser = async () => {
+  const fetchDbUser = useCallback(async () => {
     try {
       const profile = await getUserProfile();
       setDbUser(profile);
     } catch (error) {
       console.error("Failed to fetch DB profile", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (initialState.user) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         fetchDbUser();
         return;
     }
@@ -83,7 +84,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
               setUser(currentUser);
               if (currentUser) {
-                await fetchDbUser();
+                // We can't use fetchDbUser directly here if we want to avoid stale closures if it wasn't a ref or callback
+                // But since we are inside an effect that runs once, we can just call the API or the callback
+                try {
+                    const profile = await getUserProfile();
+                    setDbUser(profile);
+                } catch (e) { console.error(e); }
               } else {
                 setDbUser(null);
               }
@@ -101,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // or just let it stay in loading state if we mock the whole context
         setLoading(false); 
     }
-  }, []);
+  }, [initialState.user, fetchDbUser]);
 
   const signInWithGoogle = async () => {
     try {

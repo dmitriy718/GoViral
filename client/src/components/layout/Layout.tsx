@@ -17,7 +17,7 @@ export function Layout() {
 
   // Polling for verification status
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout;
     if (isUnverified) {
       interval = setInterval(async () => {
         await refreshProfile();
