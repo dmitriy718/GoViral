@@ -1,9 +1,9 @@
-# GoViral Project - Final Coding Hours Log
+# PostDoctor Project - Final Coding Hours Log
 
 ## Phase 1: Initial Review
 
 ### Overview
-Starting comprehensive audit of the GoViral codebase.
+Starting comprehensive audit of the PostDoctor codebase.
 
 ### Findings
 - **Critical**: Rate limiter (`server/src/middleware/rateLimit.ts`) uses in-memory `Map`, which is not scalable or persistent. `ioredis` is installed but not used here.
@@ -44,12 +44,12 @@ Starting comprehensive audit of the GoViral codebase.
 ## Phase 7: Documentation & Wrap-Up
 
 ### Summary
-The GoViral codebase has been audited, hardened, and prepped for production.
+The PostDoctor codebase has been audited, hardened, and prepped for production.
 - **Security**: Auth bypass is now strictly guarded. Env vars are validated.
 - **Performance**: Rate limiting uses Redis. Compression and HPP enabled.
 - **Quality**: Type errors fixed, linting passed.
 
 ### Next Steps
-1.  **Resolve VPS Deployment**: The VPS needs to be updated to serve the correct GoViral/PostDoctor application.
+1.  **Resolve VPS Deployment**: The VPS needs to be updated to serve the correct PostDoctor application.
 2.  **Secrets**: Provide `FIREBASE_SERVICE_ACCOUNT` and `DATABASE_URL` (Redis enabled) to the production environment.
 3.  **Run Tests**: Once deployed, run `npx playwright test --config client/playwright.prod.config.ts` to verify.
