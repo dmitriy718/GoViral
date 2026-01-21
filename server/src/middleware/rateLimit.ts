@@ -5,10 +5,22 @@ import { logger } from '../utils/logger';
 
 // Initialize Redis client
 // We use a separate client for rate limiting to avoid blocking other operations if we had a shared client
-const redis = new Redis(env.DATABASE_URL?.includes('redis') ? env.DATABASE_URL : process.env.REDIS_URL || 'redis://localhost:6379');
+// Use lazyConnect to prevent immediate connection errors from crashing the app
+const redisUrl = env.DATABASE_URL?.includes('redis') ? env.DATABASE_URL : process.env.REDIS_URL || 'redis://localhost:6379';
+const redis = new Redis(redisUrl, {
+    lazyConnect: true,
+    enableOfflineQueue: false, // Fail fast if Redis is down
+    retryStrategy: (times) => {
+        if (times > 3) {
+            return null; // Stop retrying after 3 attempts
+        }
+        return Math.min(times * 50, 2000);
+    }
+});
 
 redis.on('error', (err) => {
-    logger.warn({ err }, 'Redis rate limiter error, falling back to permissive mode');
+    // Suppress intense logging of connection refused
+    // logger.warn({ err }, 'Redis rate limiter error');
 });
 
 interface RateLimitOptions {
