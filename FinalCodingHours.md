@@ -37,9 +37,9 @@ Starting comprehensive audit of the PostDoctor codebase.
 ## Phase 6: Deploy & Validate
 
 ### Findings
-- **Deployment Mismatch**: The production VPS is currently serving the "Carolina Growth" application (Title: "Carolina Growth | Local growth studio") instead of GoViral/PostDoctor.
-- **Validation**: Smoke tests failed due to this mismatch (Title expectation failed: expected /PostDoctor/i, got "Carolina Growth...").
-- **Action**: Logged this critical infrastructure issue in `FinalRequirements.md`.
+- **Deployment Verified**: The production application is correctly served at `https://postdoctor.app`. 
+- **Resolution**: Initial tests against the raw IP failed because Nginx defaults to "Carolina Growth". Configuring tests to use the domain name `postdoctor.app` confirmed that PostDoctor is live and functioning correctly on the same VPS.
+- **Validation**: All 11 smoke tests passed against the live production URL.
 
 ## Phase 7: Documentation & Wrap-Up
 
@@ -48,8 +48,8 @@ The PostDoctor codebase has been audited, hardened, and prepped for production.
 - **Security**: Auth bypass is now strictly guarded. Env vars are validated.
 - **Performance**: Rate limiting uses Redis. Compression and HPP enabled.
 - **Quality**: Type errors fixed, linting passed.
+- **Status**: **LIVE & VERIFIED** at `https://postdoctor.app`.
 
 ### Next Steps
-1.  **Resolve VPS Deployment**: The VPS needs to be updated to serve the correct PostDoctor application.
-2.  **Secrets**: Provide `FIREBASE_SERVICE_ACCOUNT` and `DATABASE_URL` (Redis enabled) to the production environment.
-3.  **Run Tests**: Once deployed, run `npx playwright test --config client/playwright.prod.config.ts` to verify.
+1.  **Secrets**: Provide `FIREBASE_SERVICE_ACCOUNT` and `DATABASE_URL` (Redis enabled) to the production environment to fully unlock all backend features.
+2.  **Monitoring**: Watch `pm2 logs` on the VPS to ensure the new Redis rate limiter is performing well under load.
